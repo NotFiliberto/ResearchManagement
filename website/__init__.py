@@ -2,9 +2,9 @@ from flask import Flask
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__)  # name of the file
 
-    app.config['SECRET_KEY'] = 'notFil6e660'
+    app.config['SECRET_KEY'] = 'notFil6e660'  # use .env file in production
 
     # blueprints
     from .views import views

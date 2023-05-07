@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 
 auth = Blueprint('auth', __name__)
 
@@ -13,6 +13,14 @@ def sign_out():
     return "<div>logout page</div>"
 
 
-@auth.route('/signup')
+@auth.route('/signup', methods=["GET", "POST"])
 def sign_up():
+
+    if request.method == "POST":
+        # TODO validation logic
+        # TODO register logic
+        data = request.form
+        print(data)
+        return "registra utente"
+
     return render_template('auth/signup.html', text="ADDITIONAL TEXT", boolean=False)

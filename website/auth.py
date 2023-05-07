@@ -15,4 +15,4 @@ def sign_out():
 
 @auth.route('/signup')
 def sign_up():
-    return "<div>sign up page</div>"
+    return render_template('auth/signup.html', text="ADDITIONAL TEXT", boolean=False)

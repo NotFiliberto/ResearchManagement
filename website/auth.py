@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash
 
 auth = Blueprint('auth', __name__)
 
@@ -17,10 +17,19 @@ def sign_out():
 def sign_up():
 
     if request.method == "POST":
-        # TODO validation logic
-        # TODO register logic
         data = request.form
         print(data)
-        return "registra utente"
+
+        # TODO validation logic
+        username = request.form.get('username')
+
+        if (len(username) <= 2):
+            flash('Username must be grater than 2 characters',
+                  category='input_error')
+        else:
+            flash('Account created', category='success')
+
+        # TODO registration logic (db)
+        # return "registra utente"
 
     return render_template('auth/signup.html', text="ADDITIONAL TEXT", boolean=False)

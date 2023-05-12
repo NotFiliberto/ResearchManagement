@@ -30,7 +30,7 @@ def sign_in():
             flash('Wrong email or password!',
                   category='error')
 
-    return render_template('auth/signin.html', text="ADDITIONAL TEXT", boolean=False)
+    return render_template('auth/signin.html')
 
 
 @auth.route('/signout')
@@ -70,11 +70,11 @@ def sign_up():
             flash('Account created', category='success')
 
             # signin user
-            login_user(new_user, remember=True)
+            login_user(new_user, remember=True, user=new_user)
 
             # inherit the url from view (BLUPRINT_NAME.FUNCTION_NAME u want go to)
             return redirect(url_for('views.home'))
 
         # return "registra utente"
 
-    return render_template('auth/signup.html', text="ADDITIONAL TEXT", boolean=False)
+    return render_template('auth/signup.html', text="")

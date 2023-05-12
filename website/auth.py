@@ -6,8 +6,29 @@ from . import db
 auth = Blueprint('auth', __name__)
 
 
-@auth.route('/signin')
+@auth.route('/signin', methods=["GET", "POST"])
 def sign_in():
+
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        # authentication
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            # check password
+            if check_password_hash(user.password, password):
+                flash('Signed in successfully', category='success')
+                return redirect(url_for('views.home'))  # redirect after login
+
+            else:
+                flash('Wrong email or password!',
+                      category='error')
+        else:
+            flash('Wrong email or password!',
+                  category='error')
+
     return render_template('auth/signin.html', text="ADDITIONAL TEXT", boolean=False)
 
 
@@ -28,9 +49,14 @@ def sign_up():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        if (len(username) <= 2):
+        # check if user already exists
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            flash('Email already exists', category='error')
+        elif (len(username) <= 2):
             flash('Username must be grater than 2 characters',
-                  category='input_error')
+                  category='error')
         else:
             # TODO registration logic (db)
             new_user = User(email=email, username=username,

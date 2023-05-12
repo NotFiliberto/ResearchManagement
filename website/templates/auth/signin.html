@@ -41,6 +41,19 @@
                 Not true
                 {% endif %}
             </div>
+            <div class="text-center py-3">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                {% if category == "error" %}
+                <div class="text-red-400">{{message}}</div>
+                {% elif category == 'success' %}
+                <div class="text-green-400">{{message}}</div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+            </div>
 
             <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form class="space-y-6"

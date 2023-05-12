@@ -3,5 +3,5 @@
         "editor.defaultFormatter": "ms-python.autopep8"
     },
     "python.formatting.provider": "none",
-    "cSpell.words": ["signin", "signout"]
+    "cSpell.words": ["signin", "signout", "sqlalchemy"]
 }

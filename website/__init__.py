@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager  # essential for managing signed in users
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -26,5 +27,17 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+
+    # setup flask login manager
+    login_manager = LoginManager()  # create login manager
+
+    # redirect to this template if the user is not signed in
+    login_manager.login_view = 'auth.sign_in'
+    login_manager.init_app(app)
+
+    # tell flask login to use this function to load the user
+    @login_manager.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
 
     return app

@@ -3,6 +3,9 @@
 from website import create_app
 
 app = create_app()
-#sus
-if __name__ == '__main__':
+
+
+# prevent running additional servers if you 
+# import something from
+if __name__ == '__main__':  
     app.run(debug=True)

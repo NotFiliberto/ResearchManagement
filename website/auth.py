@@ -63,14 +63,14 @@ def sign_up():
         else:
             # TODO registration logic (db)
             new_user = User(email=email, username=username,
-                            password=generate_password_hash(password, method='sha256'))
+                            password=generate_password_hash(password, method='scrypt'))
             db.session.add(new_user)
             db.session.commit()  # notify the db that we've made some changes so update it
 
             flash('Account created', category='success')
 
             # signin user
-            login_user(new_user, remember=True, user=new_user)
+            login_user(remember=True, user=new_user)
 
             # inherit the url from view (BLUPRINT_NAME.FUNCTION_NAME u want go to)
             return redirect(url_for('views.home'))

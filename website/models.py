@@ -1,33 +1,33 @@
-# going to use it as a sort of database models
-from sqlalchemy.dialects.postgresql import UUID
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
-import uuid
 import enum
 
+
 class User(db.Model, UserMixin):  # User class extends db.Model and UserMixin
-    user_id = db.Column( 'user_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     email = db.Column(db.String(150), unique=True)
 
     # relationship must be written with CAPITAL LETTER (we do not know why)
-    researcher = db.relationship('Researcher')
-    evaluator = db.relationship('Evaluator')
 
 
-class Researcher(db.Model):
-    user_id = db.Column(db.String(150), db.ForeignKey('user.user_id'), primary_key=True)
+class Researcher(User):
+    __mapper_args__ = {
+        'polymorphic_identity': 'researcher',
+    }
 
 
-class Evaluator(db.Model):
-    user_id = db.Column(db.String(150), db.ForeignKey('user.user_id'), primary_key=True)
+class Evaluator(User):
+    __mapper_args__ = {
+        'polymorphic_identity': 'evaluator',
+    }
 
 
 class Evaluation_Interval(db.Model):
-    __tablename__ = "evaluation_interval"
-    evaluation_interval_id = db.Column( 'evaluation_interval_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
+    __tablename__ = 'evaluation_interval'
+    evaluation_interval_id = db.Column(db.Integer, primary_key=True)
     start = db.Column(db.Date())
     end = db.Column(db.Date())
 
@@ -40,7 +40,7 @@ class ProjectStatus(enum.Enum):
 
 
 class Project(db.Model):
-    project_id = db.Column( 'project_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
+    project_id = db.Column(db.Integer, primary_key=True)
     status = db.Column(
         db.Enum(ProjectStatus, values_callable=lambda obj: [
                 e.value for e in obj]),
@@ -50,33 +50,26 @@ class Project(db.Model):
     )
     evaluation_interval_id = db.Column(db.String(150), db.ForeignKey(
         'evaluation_interval.evaluation_interval_id'))
-    researcher_id = db.Column(
-        db.String(150), db.ForeignKey('researcher.user_id'))
+
+    # relations
+    db.Column(
+        db.Integer, db.ForeignKey('researcher.id'))
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
 
 
 class Document(db.Model):
-    document_id = db.Column( 'document_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
+    document_id = db.Column(db.Integer, primary_key=True)
     file_extension = db.Column(db.String(10))
     file_name = db.Column(db.String(150))
     topic = db.Column(db.String(150))
-    project_id = db.Column(db.String(150), db.ForeignKey(
+    project_id = db.Column(db.Integer, db.ForeignKey(
         'project.project_id'))
 
 
 class Report(db.Model):
-    report_id = db.Column( 'report_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
-    evaluator_id = db.Column(
-        db.String(150), db.ForeignKey('evaluator.user_id'))
+    report_id = db.Column(db.Integer, primary_key=True)
+    db.Column(
+        db.Integer, db.ForeignKey('evaluator.id'))
     document_id = db.Column(
-        db.String(150), db.ForeignKey('document.document_id'))
+        db.Integer, db.ForeignKey('document.document_id'))
     description = db.Column(db.Text())
-
-
-class Note(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String(10000))
-    date = db.Column(db.DateTime(timezone=True), default=func.now())
-
-    # foreign keys must be LOWER CASE
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

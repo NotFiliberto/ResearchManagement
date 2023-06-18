@@ -70,7 +70,7 @@ def sign_up():
             flash('Account created', category='success')
 
             # signin user
-            login_user(new_user, remember=True, user=new_user)
+            login_user(remember=True, user=new_user)
 
             # inherit the url from view (BLUPRINT_NAME.FUNCTION_NAME u want go to)
             return redirect(url_for('views.home'))

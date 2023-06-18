@@ -19,11 +19,11 @@ class User(db.Model, UserMixin):  # User class extends db.Model and UserMixin
 
 
 class Researcher(db.Model):
-    user_id = db.Column(db.String(150), db.ForeignKey('user.user_id'))
+    user_id = db.Column(db.String(150), db.ForeignKey('user.user_id'), primary_key=True)
 
 
 class Evaluator(db.Model):
-    user_id = db.Column(db.String(150), db.ForeignKey('user.user_id'))
+    user_id = db.Column(db.String(150), db.ForeignKey('user.user_id'), primary_key=True)
 
 
 class Evaluation_Interval(db.Model):

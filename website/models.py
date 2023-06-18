@@ -27,6 +27,7 @@ class Evaluator(db.Model):
 
 
 class Evaluation_Interval(db.Model):
+    __tablename__ = "evaluation_interval"
     evaluation_interval_id = db.Column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     start = db.Column(db.Date())

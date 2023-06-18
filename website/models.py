@@ -7,8 +7,7 @@ import uuid
 import enum
 
 class User(db.Model, UserMixin):  # User class extends db.Model and UserMixin
-    user_id = db.Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = db.Column( 'user_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
     username = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     email = db.Column(db.String(150), unique=True)
@@ -28,8 +27,7 @@ class Evaluator(db.Model):
 
 class Evaluation_Interval(db.Model):
     __tablename__ = "evaluation_interval"
-    evaluation_interval_id = db.Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    evaluation_interval_id = db.Column( 'evaluation_interval_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
     start = db.Column(db.Date())
     end = db.Column(db.Date())
 
@@ -42,8 +40,7 @@ class ProjectStatus(enum.Enum):
 
 
 class Project(db.Model):
-    project_id = db.Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    project_id = db.Column( 'project_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
     status = db.Column(
         db.Enum(ProjectStatus, values_callable=lambda obj: [
                 e.value for e in obj]),
@@ -59,8 +56,7 @@ class Project(db.Model):
 
 
 class Document(db.Model):
-    document_id = db.Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    document_id = db.Column( 'document_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
     file_extension = db.Column(db.String(10))
     file_name = db.Column(db.String(150))
     topic = db.Column(db.String(150))
@@ -69,8 +65,7 @@ class Document(db.Model):
 
 
 class Report(db.Model):
-    report_id = db.Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    report_id = db.Column( 'report_id', db.Text(length=36), default=lambda: str(uuid.uuid4()), primary_key=True)
     evaluator_id = db.Column(
         db.String(150), db.ForeignKey('evaluator.user_id'))
     document_id = db.Column(

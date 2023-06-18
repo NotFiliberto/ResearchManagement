@@ -23,7 +23,7 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/auth')
 
     # create db
-    from .models import User, Note
+    from .models import User
 
     with app.app_context():
         db.create_all()
@@ -37,7 +37,7 @@ def create_app():
 
     # tell flask login to use this function to load the user
     @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(int(id))
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     return app

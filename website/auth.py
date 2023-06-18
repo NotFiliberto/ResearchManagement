@@ -63,7 +63,11 @@ def sign_up():
         else:
             # TODO registration logic (db)
             new_user = User(email=email, username=username,
+<<<<<<< HEAD
                             password=generate_password_hash(password, method='sha256'))
+=======
+                            password=generate_password_hash(password, method='scrypt'))
+>>>>>>> 9b262272dc9553e341a170a440fa45d30ab7a82c
             db.session.add(new_user)
             db.session.commit()  # notify the db that we've made some changes so update it
 
@@ -77,4 +81,8 @@ def sign_up():
 
         # return "registra utente"
 
+<<<<<<< HEAD
     return render_template('auth/signup.html', text="")
+=======
+    return render_template('auth/signup.html', text="")
+>>>>>>> 9b262272dc9553e341a170a440fa45d30ab7a82c

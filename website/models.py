@@ -72,4 +72,8 @@ class Report(db.Model):
         db.Integer, db.ForeignKey('evaluator.id'))
     document_id = db.Column(
         db.Integer, db.ForeignKey('document.document_id'))
+<<<<<<< HEAD
     description = db.Column(db.Text())
+=======
+    description = db.Column(db.Text())
+>>>>>>> 9b262272dc9553e341a170a440fa45d30ab7a82c

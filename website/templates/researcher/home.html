@@ -1,0 +1,108 @@
+{% extends "base.html" %} {% block title %}Researcher Home{% endblock %}
+
+{% block content %}
+
+<div class="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56 ">
+
+    <div class="text-center w-full mb-20 text-xl">
+        <p>
+            Ciao
+            <span class="text-gray-900"> <span class="font-bold">{{user.username}}</span>!
+            </span>Cosa vuoi fare?
+        </p>
+    </div>
+
+
+    <div class="px-4 py-5 sm:px-6">
+        <!-- Heading progetti -->
+        <div class="-ml-4 -mt-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
+            <div class="ml-4 mt-4">
+                <h3 class="text-xl font-semibold leading-6 text-gray-900">Progetti Personali</h3>
+                <p class="mt-1 text-sm text-gray-500">Vedi lo stato dei tuoi progetti recenti o fanne valutare uno
+                    nuovo!</p>
+            </div>
+            <div class="ml-4 mt-4 flex-shrink-0">
+                <button type="button"
+                    class="relative inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Valuta
+                    nuovo</button>
+            </div>
+        </div>
+        <div class="py-12" />
+
+        <div class="relative">
+            <div class="absolute inset-0 flex items-center"
+                aria-hidden="true">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+        </div>
+        <div class="py-12" />
+        <div class="">
+            <ul>
+                <li
+                    class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
+                    <div>
+                        <div class="sm:flex sm:items-baseline sm:justify-between">
+                            <div class="sm:w-0 sm:flex-1">
+                                <h1 id="message-heading"
+                                    class="text-base font-semibold leading-6 text-indigo-600">Nome progetto</h1>
+
+
+                                <p class="mt-1 truncate text-sm text-gray-500 inline">Piccola descrizione qui...</p>
+                            </div>
+
+                            <div
+                                class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
+                                <span
+                                    class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Approvato</span>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li
+                    class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
+                    <div>
+                        <div class="sm:flex sm:items-baseline sm:justify-between">
+                            <div class="sm:w-0 sm:flex-1">
+                                <h1 id="message-heading"
+                                    class="text-base font-semibold leading-6 text-indigo-600">Progetto2</h1>
+
+
+                                <p class="mt-1 truncate text-sm text-gray-500 inline">Piccola descrizione qui...</p>
+                            </div>
+
+                            <div
+                                class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
+                                <span
+                                    class="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20">In
+                                    attesa</span>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li
+                    class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
+                    <div>
+                        <div class="sm:flex sm:items-baseline sm:justify-between">
+                            <div class="sm:w-0 sm:flex-1">
+                                <h1 id="message-heading"
+                                    class="text-base font-semibold leading-6 text-indigo-600">Progetto2</h1>
+
+
+                                <p class="mt-1 truncate text-sm text-gray-500 inline">Piccola descrizione qui...</p>
+                            </div>
+
+                            <div
+                                class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
+                                <span
+                                    class="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">Non
+                                    approvato</span>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

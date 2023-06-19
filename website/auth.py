@@ -29,48 +29,6 @@ def sign_in():
         
         user = User.query.filter_by(email=email).first()
 
-        #db.session.add(Researcher(username='Vin1', password=generate_password_hash("1234", method='scrypt'), email="Vin1@gmail.com"))
-        #db.session.commit()
-
-        #db.session.add(Evaluator(username='Vin2', password=generate_password_hash("1234", method='scrypt'), email="Vin2@gmail.com"))
-        #db.session.commit()
-        
-        print("SEPARATOR")
-        print(User.query.filter_by(email="vineet.cesca@gmail.com").first())
-        print(Researcher.query.filter_by(id=user.id).all())
-        # authentication
-        
-        users = User.query.all()
-        print(user.id)
-        print("users here:")
-        print(User.query.all())
-        for u in users:
-            print(u.id)
-            print(u.email)     
-            print(u.username)
-            print(u.password) 
-        
-        
-        researchers = Researcher.query.all()
-        print("researchers here:")
-        print(Researcher.query.all())
-        for u in researchers:
-            print(u.id)
-            print(u.email)     
-            print(u.username)
-            print(u.password) 
-
-        evaluators = Evaluator.query.all()
-        print("evaluators here:")
-        print(Evaluator.query.all())
-        for u in evaluators:
-            print(u.id)
-            print(u.email)     
-            print(u.username)
-            print(u.password) 
-
-        print("sus")
-
         if user:
             # check password
             if check_password_hash(user.password, password):

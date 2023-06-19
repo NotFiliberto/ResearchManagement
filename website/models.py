@@ -1,6 +1,12 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+
 import enum
 
 
@@ -10,16 +16,19 @@ class User(db.Model, UserMixin):  # User class extends db.Model and UserMixin
     password = db.Column(db.String(150))
     email = db.Column(db.String(150), unique=True)
 
+    __mapper_args__ = {'polymorphic_identity': 'user'}
     # relationship must be written with CAPITAL LETTER (we do not know why)
 
 
 class Researcher(User):
+    __tablename__ = 'researcher'
     __mapper_args__ = {
         'polymorphic_identity': 'researcher',
     }
 
 
 class Evaluator(User):
+    __tablename__ = 'evaluator'
     __mapper_args__ = {
         'polymorphic_identity': 'evaluator',
     }

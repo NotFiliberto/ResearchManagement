@@ -29,8 +29,11 @@ def sign_in():
         
         user = User.query.filter_by(email=email).first()
 
-        db.session.add(Researcher(id=2, username='Vin1', password="1234", email="Vin1@gmail.com"))
-        db.session.commit()
+        #db.session.add(Researcher(username='Vin1', password=generate_password_hash("1234", method='scrypt'), email="Vin1@gmail.com"))
+        #db.session.commit()
+
+        #db.session.add(Evaluator(username='Vin2', password=generate_password_hash("1234", method='scrypt'), email="Vin2@gmail.com"))
+        #db.session.commit()
         
         print("SEPARATOR")
         print(User.query.filter_by(email="vineet.cesca@gmail.com").first())

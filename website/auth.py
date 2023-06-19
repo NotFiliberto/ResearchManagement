@@ -22,7 +22,17 @@ def sign_in():
             if check_password_hash(user.password, password):
                 flash('Signed in successfully', category='success')
                 login_user(user, remember=True)
-                return redirect(url_for('views.home'))  # redirect after login
+
+                # conditional redirect based on user type
+                if user.__class__.__name__ == "Researcher":
+                    return redirect(url_for('researcher.researcher_home'))
+                elif user.__class__.__name__ == "Evaluator":
+                    return redirect(url_for('evaluator.evaluator_home'))
+                else:
+                    print("classic user ???")
+                    # redirect after login
+                    return redirect(url_for('views.home'))
+
             else:
                 flash('Wrong email or password!',
                       category='error')

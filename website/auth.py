@@ -34,20 +34,17 @@ def sign_in():
             if check_password_hash(user.password, password):
                 flash('Signed in successfully', category='success')
                 login_user(user, remember=True)
-                #TODO redirect condizionato in base al tipo di utente
-                #if( user is valutatore ) -> redirect to valutatore page
-                #if( user is ricercatore ) -> redirect to ricercatore page
-                #Notice, researchers/evaluators must be created first and then
-                # check if they are logged as users
+
+                # conditional redirect based on user type
                 if user.__class__.__name__ == "Researcher":
-                    print("user is a researcher")
                     return redirect(url_for('researcher.researcher_home'))
                 elif user.__class__.__name__ == "Evaluator":
-                    print("user is an evaluator")
                     return redirect(url_for('evaluator.evaluator_home'))
                 else:
-                    print("user is a classic")
-                    return redirect(url_for('views.home'))  # redirect after login
+                    print("classic user ???")
+                    # redirect after login
+                    return redirect(url_for('views.home'))
+
             else:
                 flash('Wrong email or password!',
                       category='error')

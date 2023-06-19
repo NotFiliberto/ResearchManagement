@@ -69,11 +69,6 @@ def sign_in():
             print(u.username)
             print(u.password) 
 
-        print("QUERIES AND USER.ID IS: ", user.id)
-        researcher = Researcher.query.filter_by(id=user.id)
-        evaluator = Evaluator.query.filter_by(id=user.id)
-        print(researcher)
-        print(evaluator)
         print("sus")
 
         if user:
@@ -86,13 +81,14 @@ def sign_in():
                 #if( user is ricercatore ) -> redirect to ricercatore page
                 #Notice, researchers/evaluators must be created first and then
                 # check if they are logged as users
-                if researcher:
+                if user.__class__.__name__ == "Researcher":
                     print("user is a researcher")
                     return redirect(url_for('researcher.researcher_home'))
-                elif evaluator:
+                elif user.__class__.__name__ == "Evaluator":
                     print("user is an evaluator")
                     return redirect(url_for('evaluator.evaluator_home'))
                 else:
+                    print("user is a classic")
                     return redirect(url_for('views.home'))  # redirect after login
             else:
                 flash('Wrong email or password!',

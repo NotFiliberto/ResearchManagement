@@ -2,6 +2,8 @@ from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 import enum
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey
 
 
 class User(db.Model, UserMixin):  # User class extends db.Model and UserMixin
@@ -9,17 +11,26 @@ class User(db.Model, UserMixin):  # User class extends db.Model and UserMixin
     username = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     email = db.Column(db.String(150), unique=True)
+    type = db.Column(db.String(64))
 
+    __mapper_args__ = {
+        'polymorphic_identity': 'user',
+        'polymorphic_on': 'type'
+    }
     # relationship must be written with CAPITAL LETTER (we do not know why)
 
 
 class Researcher(User):
+    __tablename__ = "researcher"
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     __mapper_args__ = {
         'polymorphic_identity': 'researcher',
     }
 
 
 class Evaluator(User):
+    __tablename__ = "evaluator"
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     __mapper_args__ = {
         'polymorphic_identity': 'evaluator',
     }

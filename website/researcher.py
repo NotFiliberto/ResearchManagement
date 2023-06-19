@@ -3,8 +3,9 @@ from flask_login import login_required, current_user
 
 researcher = Blueprint('researcher', __name__)
 
-@researcher.route('/', methods=['GET', 'POST'])
+
+# home
+@researcher.route('/',  methods=['GET', 'POST'])
 @login_required
 def researcher_home():
-    return "welcome home researcher"
-
+    return render_template('researcher/home.html', user=current_user)

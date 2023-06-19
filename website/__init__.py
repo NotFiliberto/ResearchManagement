@@ -18,15 +18,24 @@ def create_app():
     # blueprints
     from .views import views
     from .auth import auth
+    from .researcher import researcher
+    from .evaluator import evaluator
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(researcher, url_prefix='/researcher')
+    app.register_blueprint(evaluator, url_prefix='/evaluator')
 
     # create db
-    from .models import User
+    from .models import User, Researcher
+
+
 
     with app.app_context():
         db.create_all()
+
+
+
 
     # setup flask login manager
     login_manager = LoginManager()  # create login manager

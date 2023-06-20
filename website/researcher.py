@@ -17,3 +17,15 @@ def researcher_home():
 def create_project():
     if request.method == "GET":
         return render_template('researcher/create.html', user=current_user)
+
+    if (request.method == "POST"):
+        # Get the list of files from webpage
+        print('UPLOAD???')
+        files = request.files.getlist("file")
+
+        # Iterate for each file in the files List, and Save them
+        i = 0
+        for file in files:
+            print("file --> ", file.filename, i)
+            i += 1
+        return "ok bro"

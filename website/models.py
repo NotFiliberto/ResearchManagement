@@ -52,6 +52,7 @@ class ProjectStatus(enum.Enum):
 
 class Project(db.Model):
     project_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200))
     status = db.Column(
         db.Enum(ProjectStatus, values_callable=lambda obj: [
                 e.value for e in obj]),

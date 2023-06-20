@@ -56,65 +56,15 @@ def create_project():
 
     if request.method == "GET":
         return render_template('researcher/create.html', user=current_user)
-    elif request.method == "POST":	
 
-        #data form
-        #db.session.add(Project(evaluation_interval_id=interval.evaluation_interval_id, researcher_id=1))
-        
-        #data = request.form
-        #print(data)
+    if (request.method == "POST"):
+        # Get the list of files from webpage
+        print('UPLOAD???')
+        files = request.files.getlist("file")
 
-        #ev_interval_id = request.form.get('ev_interval_id')
-        #res_id = request.form.get('res_id')
-
-        #project = Project(evaluation_interval_id=ev_interval_id, researcher_id=res_id)
-
-        #documenti da ricevere in input e crearli:
-        # creare una cartella nominata con l'id del progetto e dentro ci mettiamo i documenti che 
-        # l'utente carica  -> ricevuti dal form
-
-        #crea_cartella(str(Project.query.filter_by(project_id=1).first().project_id))
-
-        # mettere i documenti dentro la cartella creata
-
-        project = Project.query.filter_by(project_id=1).first()
-
-        UPLOAD_FOLDER = str(project.project_id)
-        
-        
-
-        app = Flask(__name__)
-        app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            print("file non nelle richieste file")
-            flash('No file part', category='error')
-            return render_template('researcher/create.html', user=current_user)
-       
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            print("file senza nome")
-            flash('No selected file', category='error')
-            return render_template('researcher/create.html', user=current_user)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return "sus file uploadato"
-            #return redirect(url_for('uploaded_file',filename=filename))
-
-        
-
-        #db.session.add(project)
-        #db.session.commit()
-
-        
-
-        flash('Project created', category='success')
-
-    
-
-    return render_template('researcher/create.html', user=current_user)
-
+        # Iterate for each file in the files List, and Save them
+        i = 0
+        for file in files:
+            print("file --> ", file.filename, i)
+            i += 1
+        return "ok bro"

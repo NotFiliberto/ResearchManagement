@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User, Researcher, Evaluator
+from .models import User, Researcher, Evaluator, Project
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
@@ -8,14 +8,6 @@ from flask_login import login_user, login_required, logout_user, current_user
 auth = Blueprint('auth', __name__)
 
 
-#TODO route per i projects con def metodi crud: 
-#  create(idProgetto, ricercatore), read(ricercatore, valutatore), update, delete  (crud operations)
-# sempre controllare che chi fa un'operazione debba essere loggato (prima)
-# per fare create -> /root/create : se il metodo è GET reinderizzi sulla pagina createProject.html
-# se il metodo è POST (if requested.method == "POST"), returno la stringa che
-#  il progetto è stato creato con successo
-# tutte  le route sono renderizzate da una cartella apposita fuori da website 
-# @auth.route()
 @auth.route('/test', methods=["GET", "POST"])
 def test():
     return "hello_world"
@@ -27,7 +19,7 @@ def sign_in():
         email = request.form.get('email')
         password = request.form.get('password')
         
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first() 
 
         if user:
             # check password

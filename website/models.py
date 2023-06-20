@@ -69,7 +69,7 @@ class Project(db.Model):
         'evaluation_interval.evaluation_interval_id'))
 
     # relations
-    db.Column(
+    researcher_id = db.Column(
         db.Integer, db.ForeignKey('researcher.id'))
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
 

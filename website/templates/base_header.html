@@ -1,0 +1,7 @@
+{% if user.is_authenticated %}
+{% if user.__class__.__name__ == "Researcher" %}
+{% include '/researcher/header.html' %}
+{% elif user.__class__.__name__ == "Evaluator" %}
+{% include '/evaluator/header.html' %}
+{% endif %}
+{% endif %}

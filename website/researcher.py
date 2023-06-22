@@ -63,15 +63,21 @@ def create_project():
     if request.method == "POST":
         # Saving data request form into DB Project 
         project_name = request.form.get('project_name') 
-        description = request.form.get('description')
+        # Description handle: description = request.form.get('description')
+
+        # All files in load list must be PDF's
+        files = request.files.getlist("file")
+        for file in files:
+            extension = os.path.splitext(file.filename)[1]
+            if extension.lower() != '.pdf':
+                flash('Upload only PDFs', category='error')
+                return redirect(url_for('researcher.create_project'))
 
         # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
         project = Project(name=project_name, evaluation_interval_id=1,
                            researcher_id=current_user.id)
         db.session.add(project)
         db.session.commit()
-
-        files = request.files.getlist("file")
 
         # Iterate each file in the files List and save them 
         i = 0
@@ -80,10 +86,6 @@ def create_project():
             if len(file.filename) == 0:
                 flash('No file was loaded', category='error')
             else:
-                extension = os.path.splitext(file.filename)[1]
-                if extension.lower() != '.pdf':
-                    flash('Upload only PDFs', category='error')
-                    return redirect(url_for('researcher.researcher_home'))
                 
                 filename = secure_filename(file.filename)
                 
@@ -109,6 +111,9 @@ def create_project():
                 
                 flash('Files loaded', category='success')
                 i += 1
+
+                flash('Project has been successfully created', category='success')
+                return redirect(url_for('researcher.researcher_home'))
     
     return render_template('researcher/create.html', user=current_user)
 

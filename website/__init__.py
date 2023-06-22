@@ -27,10 +27,15 @@ def create_app():
     app.register_blueprint(researcher, url_prefix='/researcher')
 
     # create db
-    from .models import User
+    from .models import User, Researcher
+
+
 
     with app.app_context():
         db.create_all()
+
+
+
 
     # setup flask login manager
     login_manager = LoginManager()  # create login manager
@@ -41,7 +46,7 @@ def create_app():
 
     # tell flask login to use this function to load the user
     @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
+    def load_user(id):
+        return User.query.get(int(id))
 
     return app

@@ -1,11 +1,16 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User
+from .models import User, Researcher, Evaluator, Project
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
 
+
 auth = Blueprint('auth', __name__)
 
+
+@auth.route('/test', methods=["GET", "POST"])
+def test():
+    return "hello_world"
 
 @auth.route('/signin', methods=["GET", "POST"])
 def sign_in():
@@ -15,7 +20,7 @@ def sign_in():
         password = request.form.get('password')
 
         # authentication
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first() 
 
         if user:
             # check password

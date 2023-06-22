@@ -7,7 +7,6 @@ from .models import Project, ProjectStatus, Evaluation_Interval, Researcher, Doc
 from werkzeug.utils import secure_filename
 from . import db
 import datetime
-import PyPDF2
 
 
 def read_project(project_id):

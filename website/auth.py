@@ -12,6 +12,7 @@ auth = Blueprint('auth', __name__)
 def test():
     return "hello_world"
 
+
 @auth.route('/signin', methods=["GET", "POST"])
 def sign_in():
 
@@ -20,7 +21,7 @@ def sign_in():
         password = request.form.get('password')
 
         # authentication
-        user = User.query.filter_by(email=email).first() 
+        user = User.query.filter_by(email=email).first()
 
         if user:
             # check password

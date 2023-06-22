@@ -1,5 +1,4 @@
 {% extends "base.html" %} {% block title %}Researcher Home{% endblock %}
-
 {% block content %}
 
 <div class="mx-auto max-w-2xl pt-32 sm:pt-48 lg:pt-56 ">
@@ -49,26 +48,14 @@
             </div>
         </div>
         <div class="py-12" />
+
         <div class="">
             <ul>
+
+                {% for project in projects %}
                 <li
                     class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
                     <div>
-<<<<<<< HEAD
-                        <div class="sm:flex sm:items-baseline sm:justify-between">
-                            <div class="sm:w-0 sm:flex-1">
-                                <h1 id="message-heading"
-                                    class="text-base font-semibold leading-6 text-indigo-600">Nome progetto</h1>
-
-
-                                <p class="mt-1 truncate text-sm text-gray-500 inline">Piccola descrizione qui...</p>
-                            </div>
-
-                            <div
-                                class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
-                                <span
-                                    class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Approvato</span>
-=======
                         <a href="{{ url_for('researcher.view_project', project_id=project.id) }}">
                             <div class="sm:flex sm:items-baseline sm:justify-between">
                                 <div class="sm:w-0 sm:flex-1">
@@ -98,53 +85,11 @@
                                         class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Approvato</span>
                                     {% endif %}
                                 </div>
->>>>>>> b79aadeaedd777e0f196056f5e42518db0d9ba0f
                             </div>
                         </a>
                     </div>
                 </li>
-                <li
-                    class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
-                    <div>
-                        <div class="sm:flex sm:items-baseline sm:justify-between">
-                            <div class="sm:w-0 sm:flex-1">
-                                <h1 id="message-heading"
-                                    class="text-base font-semibold leading-6 text-indigo-600">Progetto2</h1>
-
-
-                                <p class="mt-1 truncate text-sm text-gray-500 inline">Piccola descrizione qui...</p>
-                            </div>
-
-                            <div
-                                class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
-                                <span
-                                    class="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20">In
-                                    attesa</span>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li
-                    class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
-                    <div>
-                        <div class="sm:flex sm:items-baseline sm:justify-between">
-                            <div class="sm:w-0 sm:flex-1">
-                                <h1 id="message-heading"
-                                    class="text-base font-semibold leading-6 text-indigo-600">Progetto2</h1>
-
-
-                                <p class="mt-1 truncate text-sm text-gray-500 inline">Piccola descrizione qui...</p>
-                            </div>
-
-                            <div
-                                class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
-                                <span
-                                    class="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">Non
-                                    approvato</span>
-                            </div>
-                        </div>
-                    </div>
-                </li>
+                {% endfor %}
             </ul>
         </div>
     </div>

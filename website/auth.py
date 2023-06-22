@@ -12,6 +12,7 @@ auth = Blueprint('auth', __name__)
 def test():
     return "hello_world"
 
+
 @auth.route('/signin', methods=["GET", "POST"])
 def sign_in():
 
@@ -20,7 +21,7 @@ def sign_in():
         password = request.form.get('password')
 
         # authentication
-        user = User.query.filter_by(email=email).first() 
+        user = User.query.filter_by(email=email).first()
 
         if user:
             # check password
@@ -62,7 +63,7 @@ def sign_up():
         data = request.form
         print(data)
 
-        # validation logic
+        # TODO validation logic
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
@@ -76,7 +77,7 @@ def sign_up():
             flash('Username must be grater than 2 characters',
                   category='error')
         else:
-            # registration logic 
+            # TODO registration logic (db)
             new_user = User(email=email, username=username,
                             password=generate_password_hash(password, method='scrypt'))
             db.session.add(new_user)

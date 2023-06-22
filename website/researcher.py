@@ -27,11 +27,11 @@ def read_project(project_id):
     return project_div
 
 
-def restrict_user(current_usr, user_type):
+def restrict_user(current_user, user_type):
     def decorator(route_function):
         def decorated_function(*args, **kwargs):
             # Check if user is a Researcher
-            if not current_usr.__class__.__name__ == str(user_type):
+            if not current_user.__class__.__name__ == str(user_type):
                 flash('You need to be a ' + str(user_type) +
                       ' user to access that page', category='error')
                 return redirect(url_for('auth.sign_in'))
@@ -46,11 +46,8 @@ researcher = Blueprint('researcher', __name__)
 # home
 @researcher.route('/',  methods=['GET', 'POST'])
 @login_required
-@restrict_user(current_user, "Researcher")
+# @restrict_user(current_user, "Researcher") TODO: FIX SIGN IN
 def researcher_home():
-<<<<<<< HEAD
-    return render_template('researcher/home.html', user=current_user)
-=======
     # testing
 
     # get all project based on user id
@@ -76,11 +73,11 @@ def researcher_home():
 
     return render_template('researcher/home.html', user=current_user, projects=projects, project_states=ProjectStatus)
 
->>>>>>> b79aadeaedd777e0f196056f5e42518db0d9ba0f
 
 @researcher.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_project():
+
     if request.method == "GET":
         # PRINTS EVERY TIME AS TEST read_project(id) function
         projects = Project.query.all()
@@ -89,32 +86,10 @@ def create_project():
             print(read_project(p.project_id))
         return render_template('researcher/create.html', user=current_user)
 
-    i = 0
-    total = 0
-    temp = -1
     if request.method == "POST":
-        # Saving data request form into DB Project 
-        project_name = request.form.get('project_name') 
-        # Description handle: description = request.form.get('description')
-        if len(request.files.getlist("file")) != 0:
-            temp += 1
-        print("temp ", temp)
-        # All files in load list must be PDF's
-        files = request.files.getlist("file")
-        
-        print("files: ", files)
-        
-        print("len files: ", len(request.files.getlist('file')))
-        
-        if len(request.files.getlist('file')) != 0:
-            for file in files:
-                extension = os.path.splitext(file.filename)[1]
-                if extension.lower() != '.pdf':
-                    flash('Upload only PDFs', category='error')
-                    return render_template('researcher/create.html', user=current_user)
-        else:
-            flash('No files has been loaded', category='error')
-            return render_template('researcher/create.html', user=current_user)
+        # Saving data request form into DB Project
+        project_name = request.form.get('project_name')
+        description = request.form.get('description')
 
         # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
         project = Project(name=project_name, evaluation_interval_id=1,
@@ -122,17 +97,28 @@ def create_project():
         db.session.add(project)
         db.session.commit()
 
-        # Iterate each file in the files List and save them 
+        files = request.files.getlist("file")
+
+        print("lunghezza:::",  len(request.files.getlist('file')))
+
+        # Iterate each file in the files List and save them
+        i = 0
         for file in files:
             # Wether a file si valid and was uploaded inside the form (files)
             if len(file.filename) == 0:
                 # flash error on /researcher/create.html
                 flash('No file was loaded', category='error')
+
             else:
-                total += 1
+                extension = os.path.splitext(file.filename)[1]
+                if extension.lower() != '.pdf':
+                    flash('Upload only PDFs', category='error')
+
                 filename = secure_filename(file.filename)
+
                 folder_save_into = 'project_files'
                 sub_folder = str(project.project_id)
+
                 path_save_into = os.path.join(folder_save_into, sub_folder)
                 if not os.path.exists(path_save_into):
                     os.makedirs(path_save_into)
@@ -140,22 +126,17 @@ def create_project():
                 path_to_file = os.path.join(path_save_into, filename)
                 if os.path.exists(path_to_file):
                     flash('File already exists', category='error')
-                    continue
                 # Create a document only if file does not already exists
-                document = Document(file_extension=extension, file_name=file.filename, 
-                                    topic="default topic", project_id=project.project_id)
-                #ADD Document into DB 
+                document = Document(file_extension=extension, file_name=file.filename,
+                                    topic=description, project_id=project.project_id)
+                # ADD Document into DB
                 db.session.add(document)
                 db.session.commit()
+
                 file.save(os.path.join(path_save_into, filename))
+
+                flash('Files loaded', category='success')
                 i += 1
-<<<<<<< HEAD
-                # tenere conto di quanti ne carica e quali
-                
-    flash('Project has been successfully created', category='success')
-    flash(str(i) + ' of ' + str(total) + ' files has been loaded', category='success')
-    return render_template('researcher/home.html', user=current_user)
-=======
 
     return render_template('researcher/create.html', user=current_user)
 
@@ -166,4 +147,3 @@ def view_project():
     project_id = request.args.get('project_id')
 
     return render_template('researcher/project.html', user=current_user, project_id=project_id)
->>>>>>> b79aadeaedd777e0f196056f5e42518db0d9ba0f

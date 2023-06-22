@@ -24,17 +24,18 @@ def read_project(project_id):
     project_div = [project_info, [interval.start, interval.end], [researcher.username, researcher.email]]
     return project_div
 
-def restrict_user(user_type, redirect_value):
+
+def restrict_user(current, user_type):
     def decorator(route_function):
         def decorated_function(*args, **kwargs):
         # Check if user is a Researcher
-            if not current_user.__class__.__name__ == str(user_type):
-                return redirect(url_for(str(redirect_value)))
+            if not current.__class__.__name__ == str(user_type):
+                flash('You need to be a ' + str(user_type) + ' user to access that page', category='error')
+                return redirect(url_for('auth.sign_in'))
             return route_function(*args, **kwargs)
         return decorated_function
     return decorator
     
-
 
 researcher = Blueprint('researcher', __name__)
 
@@ -45,9 +46,10 @@ researcher = Blueprint('researcher', __name__)
 def researcher_home():
     return render_template('researcher/home.html', user=current_user)
 
+
 @researcher.route('/create', methods=['GET', 'POST'])
 @login_required
-@restrict_user("Researcher", "evaluator.evaluator_home")
+@restrict_user(current_user, "Researcher")
 def create_project():
 
     if request.method == "GET":

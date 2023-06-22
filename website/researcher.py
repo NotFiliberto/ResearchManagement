@@ -27,11 +27,11 @@ def read_project(project_id):
     return project_div
 
 
-def restrict_user(current_usr, user_type):
+def restrict_user(current_user, user_type):
     def decorator(route_function):
         def decorated_function(*args, **kwargs):
             # Check if user is a Researcher
-            if not current_usr.__class__.__name__ == str(user_type):
+            if not current_user.__class__.__name__ == str(user_type):
                 flash('You need to be a ' + str(user_type) +
                       ' user to access that page', category='error')
                 return redirect(url_for('auth.sign_in'))
@@ -47,7 +47,29 @@ researcher = Blueprint('researcher', __name__)
 @researcher.route('/',  methods=['GET', 'POST'])
 @login_required
 def researcher_home():
-    return render_template('researcher/home.html', user=current_user)
+    # testing
+
+    class zzz_project:
+        def __init__(self, name, description, status):
+            self.name = name
+            self.description = description
+            self.status = status
+    projects = []
+    projects.append(zzz_project(
+        "Nome Progetto", "questa la descrizione inutile di questo progetto", ProjectStatus.NOT_APPROVED))
+    projects.append(zzz_project(
+        "l'isola di piume", "qsdafadsfadsf o", ProjectStatus.SUBMITTED_FOR_EVALUATION))
+    projects.append(zzz_project(
+        "napoli", "che dire follettini", ProjectStatus.REQUIRES_CHANGES))
+    projects.append(zzz_project(
+        "Spalletti's Town", "Uomini forti, destini forti, uomini deboli, destini deboli", ProjectStatus.APPROVED))
+
+    # pretty print projects
+    for project in projects:
+        print(str(project.__dict__))
+
+    print("DIOCANEEEEE")
+    return render_template('researcher/home.html', user=current_user, projects=projects, ok_bro=True, project_states=ProjectStatus)
 
 
 @researcher.route('/create', methods=['GET', 'POST'])

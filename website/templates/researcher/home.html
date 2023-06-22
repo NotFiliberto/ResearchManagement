@@ -1,5 +1,4 @@
 {% extends "base.html" %} {% block title %}Researcher Home{% endblock %}
-
 {% block content %}
 
 <div class="mx-auto max-w-2xl pt-32 sm:pt-48 lg:pt-56 ">
@@ -49,70 +48,46 @@
             </div>
         </div>
         <div class="py-12" />
+
         <div class="">
             <ul>
+
+                {% for project in projects %}
                 <li
                     class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
                     <div>
                         <div class="sm:flex sm:items-baseline sm:justify-between">
                             <div class="sm:w-0 sm:flex-1">
                                 <h1 id="message-heading"
-                                    class="text-base font-semibold leading-6 text-indigo-600">Nome progetto</h1>
-
-
-                                <p class="mt-1 truncate text-sm text-gray-500 inline">Piccola descrizione qui...</p>
+                                    class="text-base font-semibold leading-6 text-indigo-600">{{project.name}}
+                                </h1>
+                                <p class="mt-1 truncate text-sm text-gray-500 inline">{{project.description}}</p>
                             </div>
 
                             <div
                                 class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
-                                <span
-                                    class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Approvato</span>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li
-                    class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
-                    <div>
-                        <div class="sm:flex sm:items-baseline sm:justify-between">
-                            <div class="sm:w-0 sm:flex-1">
-                                <h1 id="message-heading"
-                                    class="text-base font-semibold leading-6 text-indigo-600">Progetto2</h1>
 
-
-                                <p class="mt-1 truncate text-sm text-gray-500 inline">Piccola descrizione qui...</p>
-                            </div>
-
-                            <div
-                                class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
-                                <span
-                                    class="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20">In
-                                    attesa</span>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li
-                    class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
-                    <div>
-                        <div class="sm:flex sm:items-baseline sm:justify-between">
-                            <div class="sm:w-0 sm:flex-1">
-                                <h1 id="message-heading"
-                                    class="text-base font-semibold leading-6 text-indigo-600">Progetto2</h1>
-
-
-                                <p class="mt-1 truncate text-sm text-gray-500 inline">Piccola descrizione qui...</p>
-                            </div>
-
-                            <div
-                                class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
+                                {% if project.status == project_states.NOT_APPROVED %}
                                 <span
                                     class="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">Non
                                     approvato</span>
+                                {% elif project.status == project_states.REQUIRES_CHANGES %}
+                                <span
+                                    class="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20">Richiede
+                                    modifiche</span>
+                                {% elif project.status == project_states.SUBMITTED_FOR_EVALUATION %}
+                                <span
+                                    class="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-600/20">In
+                                    attesa</span>
+                                {% elif project.status == project_states.APPROVED %}
+                                <span
+                                    class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Approvato</span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </li>
+                {% endfor %}
             </ul>
         </div>
     </div>

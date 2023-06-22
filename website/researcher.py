@@ -24,13 +24,16 @@ def read_project(project_id):
     project_div = [project_info, [interval.start, interval.end], [researcher.username, researcher.email]]
     return project_div
 
-def researcher_only(route_function):
-    def decorated_function(*args, **kwargs):
+def restrict_user(user_type, redirect_value):
+    def decorator(route_function):
+        def decorated_function(*args, **kwargs):
         # Check if user is a Researcher
-        if not current_user.__class__.__name__ == "Researcher":
-            return redirect(url_for('researcher.researcher_home')) 
-        return route_function(*args, **kwargs)
-    return decorated_function
+            if not current_user.__class__.__name__ == str(user_type):
+                return redirect(url_for(str(redirect_value)))
+            return route_function(*args, **kwargs)
+        return decorated_function
+    return decorator
+    
 
 
 researcher = Blueprint('researcher', __name__)
@@ -44,7 +47,7 @@ def researcher_home():
 
 @researcher.route('/create', methods=['GET', 'POST'])
 @login_required
-@researcher_only
+@restrict_user("Researcher", "evaluator.evaluator_home")
 def create_project():
 
     if request.method == "GET":

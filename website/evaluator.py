@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
 
 evaluator = Blueprint('evaluator', __name__)
@@ -18,3 +18,11 @@ evaluator = Blueprint('evaluator', __name__)
 @login_required
 def evaluator_home():
     return render_template('evaluator/home.html', user=current_user, projects=[])
+
+
+@evaluator.route('/project', methods=['GET', 'POST'])
+@login_required
+def view_project():
+    project_id = request.args.get('project_id')
+
+    return render_template('evaluator/project.html', user=current_user, project_id=project_id)

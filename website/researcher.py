@@ -52,19 +52,20 @@ def researcher_home():
 
     # get all project based on user id
     class zzz_project:
-        def __init__(self, name, description, status):
+        def __init__(self, id, name, description, status):
+            self.id = id
             self.name = name
             self.description = description
             self.status = status
     projects = []
     projects.append(zzz_project(
-        "Nome Progetto", "questa la descrizione inutile di questo progetto", ProjectStatus.NOT_APPROVED))
+        0, "Nome Progetto", "questa la descrizione inutile di questo progetto", ProjectStatus.NOT_APPROVED))
     projects.append(zzz_project(
-        "l'isola di piume", "qsdafadsfadsf o", ProjectStatus.SUBMITTED_FOR_EVALUATION))
+        1, "l'isola di piume", "qsdafadsfadsf o", ProjectStatus.SUBMITTED_FOR_EVALUATION))
     projects.append(zzz_project(
-        "napoli", "che dire follettini", ProjectStatus.REQUIRES_CHANGES))
+        2, "napoli", "che dire follettini", ProjectStatus.REQUIRES_CHANGES))
     projects.append(zzz_project(
-        "Spalletti's Town", "Uomini forti, destini forti, uomini deboli, destini deboli", ProjectStatus.APPROVED))
+        3, "Spalletti's Town", "Uomini forti, destini forti, uomini deboli, destini deboli", ProjectStatus.APPROVED))
 
     # pretty print projects
     for project in projects:
@@ -138,3 +139,11 @@ def create_project():
                 i += 1
 
     return render_template('researcher/create.html', user=current_user)
+
+
+@researcher.route('/project', methods=['GET', 'POST'])
+@login_required
+def view_project():
+    project_id = request.args.get('project_id')
+
+    return render_template('researcher/project.html', user=current_user, project_id=project_id)

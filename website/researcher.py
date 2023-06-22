@@ -48,7 +48,35 @@ researcher = Blueprint('researcher', __name__)
 @login_required
 @restrict_user(current_user, "Researcher")
 def researcher_home():
+<<<<<<< HEAD
     return render_template('researcher/home.html', user=current_user)
+=======
+    # testing
+
+    # get all project based on user id
+    class zzz_project:
+        def __init__(self, id, name, description, status):
+            self.id = id
+            self.name = name
+            self.description = description
+            self.status = status
+    projects = []
+    projects.append(zzz_project(
+        0, "Nome Progetto", "questa la descrizione inutile di questo progetto", ProjectStatus.NOT_APPROVED))
+    projects.append(zzz_project(
+        1, "l'isola di piume", "qsdafadsfadsf o", ProjectStatus.SUBMITTED_FOR_EVALUATION))
+    projects.append(zzz_project(
+        2, "napoli", "che dire follettini", ProjectStatus.REQUIRES_CHANGES))
+    projects.append(zzz_project(
+        3, "Spalletti's Town", "Uomini forti, destini forti, uomini deboli, destini deboli", ProjectStatus.APPROVED))
+
+    # pretty print projects
+    for project in projects:
+        print(str(project.__dict__))
+
+    return render_template('researcher/home.html', user=current_user, projects=projects, project_states=ProjectStatus)
+
+>>>>>>> b79aadeaedd777e0f196056f5e42518db0d9ba0f
 
 @researcher.route('/create', methods=['GET', 'POST'])
 @login_required
@@ -121,8 +149,21 @@ def create_project():
                 db.session.commit()
                 file.save(os.path.join(path_save_into, filename))
                 i += 1
+<<<<<<< HEAD
                 # tenere conto di quanti ne carica e quali
                 
     flash('Project has been successfully created', category='success')
     flash(str(i) + ' of ' + str(total) + ' files has been loaded', category='success')
     return render_template('researcher/home.html', user=current_user)
+=======
+
+    return render_template('researcher/create.html', user=current_user)
+
+
+@researcher.route('/project', methods=['GET', 'POST'])
+@login_required
+def view_project():
+    project_id = request.args.get('project_id')
+
+    return render_template('researcher/project.html', user=current_user, project_id=project_id)
+>>>>>>> b79aadeaedd777e0f196056f5e42518db0d9ba0f

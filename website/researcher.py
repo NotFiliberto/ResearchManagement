@@ -100,7 +100,7 @@ def create_project():
                     return redirect(url_for('researcher.researcher_home'))
                 # Create a document only if file does not already exists
                 document = Document(file_extension=extension, file_name=file.filename, 
-                                    topic=description, project_id=project.project_id)
+                                    topic="default topic", project_id=project.project_id)
                 #ADD Document into DB 
                 db.session.add(document)
                 db.session.commit()

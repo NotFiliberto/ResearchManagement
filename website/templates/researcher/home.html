@@ -5,6 +5,19 @@
 <div class="mx-auto max-w-2xl pt-32 sm:pt-48 lg:pt-56 ">
 
     <div class="text-center w-full mb-20 text-xl">
+        <div class="text-center py-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            {% if category == "error" %}
+            <div class="text-red-400">{{message}}</div>
+            {% elif category == 'success' %}
+            <div class="text-green-400">{{message}}</div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
         <p>
             Ciao
             <span class="text-gray-900"> <span class="font-bold">{{user.username}}</span>!

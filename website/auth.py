@@ -31,7 +31,7 @@ def sign_in():
 
                 # conditional redirect based on user type
                 if user.__class__.__name__ == "Researcher":
-                    return redirect(url_for('researcher.researcher_home'))
+                    return redirect(url_for('researcher.create_project'))
                 elif user.__class__.__name__ == "Evaluator":
                     return redirect(url_for('evaluator.evaluator_home'))
                 else:

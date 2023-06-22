@@ -29,15 +29,7 @@ def sign_in():
                 flash('Signed in successfully', category='success')
                 login_user(user, remember=True)
 
-                # conditional redirect based on user type
-                if user.__class__.__name__ == "Researcher":
-                    return redirect(url_for('researcher.researcher_home'))
-                elif user.__class__.__name__ == "Evaluator":
-                    return redirect(url_for('evaluator.evaluator_home'))
-                else:
-                    print("classic user ???")
-                    # redirect after login
-                    return redirect(url_for('views.home'))
+                return redirect(url_for('views.home'))
 
             else:
                 flash('Wrong email or password!',

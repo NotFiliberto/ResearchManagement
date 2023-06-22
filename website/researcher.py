@@ -46,9 +46,11 @@ researcher = Blueprint('researcher', __name__)
 # home
 @researcher.route('/',  methods=['GET', 'POST'])
 @login_required
+@restrict_user(current_user, "Researcher")
 def researcher_home():
     # testing
 
+    # get all project based on user id
     class zzz_project:
         def __init__(self, name, description, status):
             self.name = name
@@ -68,13 +70,11 @@ def researcher_home():
     for project in projects:
         print(str(project.__dict__))
 
-    print("DIOCANEEEEE")
-    return render_template('researcher/home.html', user=current_user, projects=projects, ok_bro=True, project_states=ProjectStatus)
+    return render_template('researcher/home.html', user=current_user, projects=projects, project_states=ProjectStatus)
 
 
 @researcher.route('/create', methods=['GET', 'POST'])
 @login_required
-@restrict_user(current_user, "Researcher")
 def create_project():
 
     if request.method == "GET":
@@ -97,6 +97,8 @@ def create_project():
         db.session.commit()
 
         files = request.files.getlist("file")
+
+        print("lunghezza:::",  len(request.files.getlist('file')))
 
         # Iterate each file in the files List and save them
         i = 0

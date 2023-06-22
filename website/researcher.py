@@ -25,11 +25,11 @@ def read_project(project_id):
     return project_div
 
 
-def restrict_user(current, user_type):
+def restrict_user(current_usr, user_type):
     def decorator(route_function):
         def decorated_function(*args, **kwargs):
         # Check if user is a Researcher
-            if not current.__class__.__name__ == str(user_type):
+            if not current_usr.__class__.__name__ == str(user_type):
                 flash('You need to be a ' + str(user_type) + ' user to access that page', category='error')
                 return redirect(url_for('auth.sign_in'))
             return route_function(*args, **kwargs)

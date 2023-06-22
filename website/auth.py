@@ -61,7 +61,7 @@ def sign_up():
         data = request.form
         print(data)
 
-        # TODO validation logic
+        # validation logic
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
@@ -75,7 +75,7 @@ def sign_up():
             flash('Username must be grater than 2 characters',
                   category='error')
         else:
-            # TODO registration logic (db)
+            # registration logic 
             new_user = User(email=email, username=username,
                             password=generate_password_hash(password, method='scrypt'))
             db.session.add(new_user)

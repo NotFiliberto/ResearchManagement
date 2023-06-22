@@ -370,15 +370,6 @@
         }
     }
 
-    // print all selected files
-    /*document.getElementById("submit").onclick = () => {
-        let project_name = document.getElementById('project_name').value
-        let description = document.getElementById('description').value
-
-        console.log(`Project Name: ${project_name}\nDescription: ${description}\nSubmitted Files:\n${JSON.stringify(FILES)}`)
-        post_upload('/researcher/create', { project_name, description, file: FILES })
-    }*/
-
     // clear entire selection
     document.getElementById("cancel").onclick = () => {
         while (gallery.children.length > 0) {

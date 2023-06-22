@@ -46,15 +46,13 @@ researcher = Blueprint('researcher', __name__)
 # home
 @researcher.route('/',  methods=['GET', 'POST'])
 @login_required
+@restrict_user(current_user, "Researcher")
 def researcher_home():
     return render_template('researcher/home.html', user=current_user)
 
-
 @researcher.route('/create', methods=['GET', 'POST'])
 @login_required
-@restrict_user(current_user, "Researcher")
 def create_project():
-
     if request.method == "GET":
         # PRINTS EVERY TIME AS TEST read_project(id) function
         projects = Project.query.all()
@@ -63,18 +61,32 @@ def create_project():
             print(read_project(p.project_id))
         return render_template('researcher/create.html', user=current_user)
 
+    i = 0
+    total = 0
+    temp = -1
     if request.method == "POST":
         # Saving data request form into DB Project 
         project_name = request.form.get('project_name') 
         # Description handle: description = request.form.get('description')
-
+        if len(request.files.getlist("file")) != 0:
+            temp += 1
+        print("temp ", temp)
         # All files in load list must be PDF's
         files = request.files.getlist("file")
-        for file in files:
-            extension = os.path.splitext(file.filename)[1]
-            if extension.lower() != '.pdf':
-                flash('Upload only PDFs', category='error')
-                return redirect(url_for('researcher.create_project'))
+        
+        print("files: ", files)
+        
+        print("len files: ", len(request.files.getlist('file')))
+        
+        if len(request.files.getlist('file')) != 0:
+            for file in files:
+                extension = os.path.splitext(file.filename)[1]
+                if extension.lower() != '.pdf':
+                    flash('Upload only PDFs', category='error')
+                    return render_template('researcher/create.html', user=current_user)
+        else:
+            flash('No files has been loaded', category='error')
+            return render_template('researcher/create.html', user=current_user)
 
         # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
         project = Project(name=project_name, evaluation_interval_id=1,
@@ -83,20 +95,16 @@ def create_project():
         db.session.commit()
 
         # Iterate each file in the files List and save them 
-        i = 0
         for file in files:
             # Wether a file si valid and was uploaded inside the form (files)
             if len(file.filename) == 0:
                 # flash error on /researcher/create.html
                 flash('No file was loaded', category='error')
-
             else:
-                
+                total += 1
                 filename = secure_filename(file.filename)
-
                 folder_save_into = 'project_files'
                 sub_folder = str(project.project_id)
-
                 path_save_into = os.path.join(folder_save_into, sub_folder)
                 if not os.path.exists(path_save_into):
                     os.makedirs(path_save_into)
@@ -104,19 +112,17 @@ def create_project():
                 path_to_file = os.path.join(path_save_into, filename)
                 if os.path.exists(path_to_file):
                     flash('File already exists', category='error')
+                    continue
                 # Create a document only if file does not already exists
                 document = Document(file_extension=extension, file_name=file.filename, 
                                     topic="default topic", project_id=project.project_id)
                 #ADD Document into DB 
                 db.session.add(document)
                 db.session.commit()
-
                 file.save(os.path.join(path_save_into, filename))
-
-                flash('Files loaded', category='success')
                 i += 1
-
-                flash('Project has been successfully created', category='success')
-                return redirect(url_for('researcher.researcher_home'))
-    
-    return render_template('researcher/create.html', user=current_user)
+                # tenere conto di quanti ne carica e quali
+                
+    flash('Project has been successfully created', category='success')
+    flash(str(i) + ' of ' + str(total) + ' files has been loaded', category='success')
+    return render_template('researcher/home.html', user=current_user)

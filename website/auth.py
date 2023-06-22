@@ -18,7 +18,8 @@ def sign_in():
     if request.method == "POST":
         email = request.form.get('email')
         password = request.form.get('password')
-        
+
+        # authentication
         user = User.query.filter_by(email=email).first() 
 
         if user:

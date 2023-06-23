@@ -1,3 +1,4 @@
+from functools import wraps
 import os
 import shutil
 from flask import Blueprint, Flask, app, render_template, request, flash
@@ -29,6 +30,7 @@ def read_project(project_id):
 
 def restrict_user(current_user, user_type):
     def decorator(route_function):
+        @wraps(route_function)
         def decorated_function(*args, **kwargs):
             # Check if user is a Researcher
             if not current_user.__class__.__name__ == str(user_type):
@@ -46,7 +48,7 @@ researcher = Blueprint('researcher', __name__)
 # home
 @researcher.route('/',  methods=['GET', 'POST'])
 @login_required
-# @restrict_user(current_user, "Researcher") TODO: FIX SIGN IN
+@restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
 def researcher_home():
     # testing
 
@@ -97,7 +99,7 @@ def create_project():
         db.session.add(project)
         db.session.commit()
 
-        files = request.files.getlist("file")
+        files = request.files.getlist("files")
 
         print("lunghezza:::",  len(request.files.getlist('file')))
 
@@ -145,6 +147,8 @@ def create_project():
 @login_required
 def view_project():
     project_id = request.args.get('project_id')
+
+    print(project_id)
 
     # TODO fetch project from db with projct_id from request
     project = {

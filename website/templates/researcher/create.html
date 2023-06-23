@@ -129,7 +129,7 @@
 
                                         <input id="hidden-input"
                                             type="file"
-                                            name="file"
+                                            name="files"
                                             multiple
                                             class="hidden" />
 
@@ -368,6 +368,11 @@
             gallery.children.length === 1 && empty.classList.remove("hidden")
             delete FILES[ou]
         }
+    }
+
+    // print all selected files
+    document.getElementById("submit").onclick = () => {
+        //console.log(document.getElementById("hidden-input"))
     }
 
     // clear entire selection

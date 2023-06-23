@@ -74,7 +74,8 @@ class CustomDocuments:
                 self.id = d_id
                 self.name = name
 
-def read_test(project_id):
+def get_Researcher_Project(project_id):
+    
     p = Project.query.filter_by(project_id=project_id).first()
     r = Researcher.query.filter_by(id=p.researcher_id).first()
     docs = Document.query.filter_by(project_id=project_id)
@@ -101,8 +102,7 @@ researcher = Blueprint('researcher', __name__)
 @restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
 def researcher_home():
     # testing
-    p = read_test(20)
-    print("\n\n\n\n", p.name, "\n\n\n")
+
     
     # get all project based on user id
     class zzz_project:
@@ -214,22 +214,9 @@ def create_project():
 @researcher.route('/project', methods=['GET', 'POST'])
 @login_required
 def get_project():
-    # TODO fetch project from db with projct_id from request
+
     project_id = request.args.get('project_id')
-    p = Project.query.filter_by(project_id=project_id).first()
-    r = Researcher.query.filter_by(id=p.researcher_id).first()
-    docs = Document.query.filter_by(project_id=project_id)
-    
-    researcher = CustomResearcher(r_id=r.id, name=r.email, username=r.username)
-    documents = []
-
-    for d in docs:
-        documents.append( CustomDocuments(d_id=d.document_id, name=d.file_name) )
-
-    project = CustomProject( project_id=p.project_id, name=p.name, description=p.description, 
-                            researcher=researcher,
-                            documents=documents
-    )
+    project = get_Researcher_Project(project_id)
     
     return render_template('researcher/project.html', user=current_user, project=project)
 

@@ -68,19 +68,19 @@
                                 <div
                                     class="mt-4 flex items-center justify-between sm:ml-6 sm:mt-0 sm:flex-shrink-0 sm:justify-start">
 
-                                    {% if project.status == project_states.NOT_APPROVED %}
+                                    {% if project.status == project_statuses.NOT_APPROVED %}
                                     <span
                                         class="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">Non
                                         approvato</span>
-                                    {% elif project.status == project_states.REQUIRES_CHANGES %}
+                                    {% elif project.status == project_statuses.REQUIRES_CHANGES %}
                                     <span
                                         class="inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20">Richiede
                                         modifiche</span>
-                                    {% elif project.status == project_states.SUBMITTED_FOR_EVALUATION %}
+                                    {% elif project.status == project_statuses.SUBMITTED_FOR_EVALUATION %}
                                     <span
                                         class="inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-600/20">In
                                         attesa</span>
-                                    {% elif project.status == project_states.APPROVED %}
+                                    {% elif project.status == project_statuses.APPROVED %}
                                     <span
                                         class="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Approvato</span>
                                     {% endif %}

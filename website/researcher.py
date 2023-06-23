@@ -71,7 +71,7 @@ def researcher_home():
     for project in projects:
         print(str(project.__dict__))
 
-    return render_template('researcher/home.html', user=current_user, projects=projects, project_states=ProjectStatus)
+    return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 
 @researcher.route('/create', methods=['GET', 'POST'])

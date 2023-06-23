@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
 
+from website.models import Project, ProjectStatus
+
 evaluator = Blueprint('evaluator', __name__)
 
 # TODO route per i projects con def metodi crud:
@@ -17,7 +19,9 @@ evaluator = Blueprint('evaluator', __name__)
 @evaluator.route('/',  methods=['GET', 'POST'])
 @login_required
 def evaluator_home():
-    return render_template('evaluator/home.html', user=current_user, projects=[])
+    # get projects
+    projects = Project.query.all()
+    return render_template('evaluator/home.html', user=current_user, projects=projects, project_states=ProjectStatus)
 
 
 @evaluator.route('/project', methods=['GET', 'POST'])
@@ -25,4 +29,17 @@ def evaluator_home():
 def view_project():
     project_id = request.args.get('project_id')
 
-    return render_template('evaluator/project.html', user=current_user, project_id=project_id)
+    # TODO fetch project from db with projct_id from request
+    project = {
+        "id": 13,
+        "name": "Isola delle rose",
+        "description": "Isola di metallo senza regole fuori dai confini italiani.",
+        "researcher": {
+            id: 3242,
+            "name": "Mario Rossi",
+            "username": "mariorossi"
+        },
+        "documents": [{"id": 0, "name": "leggi.pdf"}, {"id": 1, "name": "costituzione.pdf"}, {"id": 2, "name": "infrastruttura.pdf"}]
+    }
+
+    return render_template('evaluator/project.html', user=current_user, project=project, project_id=project_id)

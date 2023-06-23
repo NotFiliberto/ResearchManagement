@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, redirect, url_for
 from flask_login import login_required, current_user
 
 views = Blueprint('views', __name__)

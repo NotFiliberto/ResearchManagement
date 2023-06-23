@@ -1,9 +1,9 @@
 {% extends "base.html" %} {% block title %}Researcher Home{% endblock %}
 {% block content %}
 
-<div class="mx-auto max-w-2xl pt-32 sm:pt-48 lg:pt-56 ">
+<div class="mx-auto max-w-2xl pt-32 sm:pt-48 lg:pt-56 w-full">
 
-    <div class="text-center w-full mb-20 text-xl">
+    <div class="text-center w-full mb-20 text-xl w-full">
         <div class="text-center py-3">
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -20,7 +20,7 @@
         <p>
             Ciao
             <span class="text-gray-900"> <span class="font-bold">{{user.username}}</span>!
-            </span>Cosa vuoi fare?
+            </span>Da qui puoi selezionare i vari progetti e valutarli.
         </p>
     </div>
 
@@ -37,7 +37,7 @@
         </div>
         <div class="py-12" />
 
-        <div class="">
+        <div class=w-full">
             <ul>
                 {% if projects|length == 0 %}
                 <p>Attualmente non ci sono progetti da valutare...</p>
@@ -45,7 +45,7 @@
                 {% for project in projects %}
                 <li
                     class="overflow-hidden rounded-md bg-white px-6 py-4 shadow hover:bg-gray-100 hover:cursor-pointer mb-2">
-                    <div>
+                    <div class="w-full">
                         <a href="{{ url_for('evaluator.view_project', project_id=project.id) }}">
                             <div class="sm:flex sm:items-baseline sm:justify-between">
                                 <div class="sm:w-0 sm:flex-1">

@@ -109,8 +109,8 @@ def create_project():
         # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
         project = Project(name=project_name, evaluation_interval_id=1,
                           researcher_id=current_user.id)
-        #db.session.add(project)
-        #db.session.commit()
+        db.session.add(project)
+        db.session.commit()
         
         # Check number of uploading files
         files = request.files.getlist("file")
@@ -162,8 +162,8 @@ def create_project():
                 document = Document(file_extension=extension, file_name=file.filename,
                                     topic="default topic", project_id=project.project_id)
                 # ADD Document into DB
-                #db.session.add(document)
-                #db.session.commit()
+                db.session.add(document)
+                db.session.commit()
 
                 file.save(os.path.join(path_save_into, filename))
                 i += 1

@@ -71,7 +71,7 @@ def researcher_home():
     for project in projects:
         print(str(project.__dict__))
 
-    return render_template('researcher/home.html', user=current_user, projects=projects, project_states=ProjectStatus)
+    return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 
 @researcher.route('/create', methods=['GET', 'POST'])
@@ -146,4 +146,17 @@ def create_project():
 def view_project():
     project_id = request.args.get('project_id')
 
-    return render_template('researcher/project.html', user=current_user, project_id=project_id)
+    # TODO fetch project from db with projct_id from request
+    project = {
+        "id": 13,
+        "name": "Isola delle rose",
+        "description": "Isola di metallo senza regole fuori dai confini italiani.",
+        "researcher": {
+            id: 3242,
+            "name": "Mario Rossi",
+            "username": "mariorossi"
+        },
+        "documents": [{"id": 0, "name": "leggi.pdf"}, {"id": 1, "name": "costituzione.pdf"}, {"id": 2, "name": "infrastruttura.pdf"}]
+    }
+
+    return render_template('researcher/project.html', user=current_user, project=project)

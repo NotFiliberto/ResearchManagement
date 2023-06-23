@@ -1,25 +1,14 @@
 from functools import wraps
 import os
-import re
-import shutil
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session, render_template_string
 from flask import Flask
 from flask_login import login_required, current_user
 from .models import Project, ProjectStatus, Evaluation_Interval, Researcher, Document
 from werkzeug.utils import secure_filename
 from . import db
-from bs4 import BeautifulSoup
-from flask_htmlmin import HTMLMIN
-import datetime
 
-
-app = Flask(__name__)
-app.config['MINIFY_HTML'] = True
-htmlmin = HTMLMIN(app)
 
 def read_project(project_id):
-
-    
     p = Project.query.filter_by(project_id=project_id).first()
     # making a list of the project info
     print("read: ", p, " id: ", project_id)
@@ -50,7 +39,6 @@ def restrict_user(current_user, user_type):
             return route_function(*args, **kwargs)
         return decorated_function
     return decorator
-
 
 
 researcher = Blueprint('researcher', __name__)
@@ -102,21 +90,22 @@ def create_project():
 
         # Saving data request form into DB Project
         project_name = request.form.get('project_name')
+        project_description = request.form.get('description')
 
         # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
-        project = Project(name=project_name, evaluation_interval_id=1,
+        project = Project(name=project_name, description=project_description, evaluation_interval_id=1,
                           researcher_id=current_user.id)
-        db.session.add(project)
-        db.session.commit()
+        #db.session.add(project)
+        #db.session.commit()
         
         # Check number of uploading files
-        files = request.files.getlist("file")
+        files = request.files.getlist("files")
         file_str = str(files)
         # print(file_str)
         num_files = len(files)
         if num_files > 0 and file_str.count("FileStorage: ''") != 1:
             # print("Numero file da caricare: ", num_files)
-            flash("Numero di file da caricare: " + num_files, category='success')
+            flash("Numero di file da caricare: " + str(num_files), category='success')
         else:
             flash("Nessun file da caricare", category="error")
             return redirect(url_for('researcher.create_project'))
@@ -155,11 +144,10 @@ def create_project():
                     continue
 
                 # Create a document only if file does not already exists
-                document = Document(file_extension=extension, file_name=file.filename,
-                                    topic="default topic", project_id=project.project_id)
+                document = Document(file_extension=extension, file_name=file.filename, project_id=project.project_id)
                 # ADD Document into DB
-                db.session.add(document)
-                db.session.commit()
+                #db.session.add(document)
+                #db.session.commit()
 
                 file.save(os.path.join(path_save_into, filename))
                 i += 1
@@ -188,9 +176,17 @@ def view_project():
         "documents": [{"id": 0, "name": "leggi.pdf"}, {"id": 1, "name": "costituzione.pdf"}, {"id": 2, "name": "infrastruttura.pdf"}]
     }
 
-    project = read_project(project_id)
+    p = Project.query.filter_by(project_id=project_id).first()
+    r = Researcher.query.filter_by(id=p.researcher_id).first()
+    documents = Document.query.filter_by(project_id=project_id)
 
-    print("\project: ", project)
+    project = [p.project_id, p.name, p.description, 
+                [r.id, r.email, r.username],]
+    for d in documents:
+        dt = [d.document_id, d.filename]
+        project.append(dt)
+
+    print(project)
 
     return render_template('researcher/project.html', user=current_user, project=project)
 

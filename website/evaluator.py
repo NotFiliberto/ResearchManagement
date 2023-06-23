@@ -1,7 +1,37 @@
 from flask import Blueprint, flash, render_template, request
 from flask_login import login_required, current_user
+from .researcher import CustomResearcher, CustomDocuments, print_Projects
 
-from website.models import Project, ProjectStatus
+from website.models import Project, ProjectStatus, Researcher, Document
+
+class CustomProject:
+    def __init__(self, project_id, name, description, status, researcher, documents):
+        self.id = project_id
+        self.name = name
+        self.description = description
+        self.status = status
+        self.researcher = researcher
+        self.documents = documents
+
+def get_Evaluator_Project(project_id):
+
+    p = Project.query.filter_by(project_id=project_id).first()
+    r = Researcher.query.filter_by(id=p.researcher_id).first()
+    docs = Document.query.filter_by(project_id=project_id)
+
+    researcher = CustomResearcher(r_id=r.id, name=r.email, username=r.username)
+    documents = []
+    for d in docs:
+        documents.append( CustomDocuments(d_id=d.document_id, name=d.file_name) )
+    
+    project = CustomProject(project_id=p.project_id, name=p.name, description=p.description, status=ProjectStatus.SUBMITTED_FOR_EVALUATION, 
+                            researcher=researcher, 
+                            documents=documents)
+
+    return project
+
+
+
 
 evaluator = Blueprint('evaluator', __name__)
 
@@ -13,9 +43,8 @@ evaluator = Blueprint('evaluator', __name__)
 #  il progetto è stato creato con successo
 # tutte  le route sono renderizzate da una cartella apposita fuori da website
 
+
 # home
-
-
 @evaluator.route('/',  methods=['GET', 'POST'])
 @login_required
 def evaluator_home():
@@ -27,35 +56,15 @@ def evaluator_home():
 @evaluator.route('/evaluate_project', methods=['GET', 'POST'])
 @login_required
 def evaluate_project():
+
     if request.method == "GET":
         project_id = request.args.get('project_id')
         # TODO fetch project from db with projct_id from request
-        project = {
-            "id": 13,
-            "name": "Isola delle rose",
-            "description": "Isola di metallo senza regole fuori dai confini italiani.",
-            "status": ProjectStatus.SUBMITTED_FOR_EVALUATION,
-            "researcher": {
-                id: 3242,
-                "name": "Mario Rossi",
-                "username": "mariorossi"
-            },
-            "documents": [{"id": 0, "name": "leggi.pdf"}, {"id": 1, "name": "costituzione.pdf"}, {"id": 2, "name": "infrastruttura.pdf"}]
-        }
+        project = get_Evaluator_Project(project_id)
 
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)
     if request.method == "POST":
         flash("ok valutato", category="success")
-        project = {
-            "id": 13,
-            "name": "Isola delle rose",
-            "description": "Isola di metallo senza regole fuori dai confini italiani.",
-            "status": ProjectStatus.SUBMITTED_FOR_EVALUATION,
-            "researcher": {
-                id: 3242,
-                "name": "Mario Rossi",
-                "username": "mariorossi"
-            },
-            "documents": [{"id": 0, "name": "leggi.pdf"}, {"id": 1, "name": "costituzione.pdf"}, {"id": 2, "name": "infrastruttura.pdf"}]
-        }
+        print("\n\nID: ", project_id)
+        project = get_Evaluator_Project(project_id)
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)

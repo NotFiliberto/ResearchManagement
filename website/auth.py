@@ -29,6 +29,7 @@ def sign_in():
                 flash('Signed in successfully', category='success')
                 login_user(user, remember=True)
 
+<<<<<<< HEAD
                 # conditional redirect based on user type
                 if user.__class__.__name__ == "Researcher":
                     return redirect(url_for('researcher.create_project'))
@@ -38,6 +39,9 @@ def sign_in():
                     print("classic user ???")
                     # redirect after login
                     return redirect(url_for('views.home'))
+=======
+                return redirect(url_for('views.home'))
+>>>>>>> 28705526e1782ad53b0c5a8d4696e25d10e3f913
 
             else:
                 flash('Wrong email or password!',

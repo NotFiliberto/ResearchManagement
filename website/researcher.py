@@ -105,7 +105,7 @@ researcher = Blueprint('researcher', __name__)
 # home
 @researcher.route('/',  methods=['GET', 'POST'])
 @login_required
-@restrict_user(current_user, "Researcher") #TODO: FIX SIGN IN
+@restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
 def researcher_home():
     # testing
     p = read_test(20)
@@ -226,6 +226,7 @@ def view_project():
     p = Project.query.filter_by(project_id=project_id).first()
     r = Researcher.query.filter_by(id=p.researcher_id).first()
     documents = Document.query.filter_by(project_id=project_id)
+    print(project_id)
 
     # TODO fetch project from db with projct_id from request
     p = Project.query.filter_by(project_id=project_id).first()

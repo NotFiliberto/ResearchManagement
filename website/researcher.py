@@ -52,8 +52,8 @@ researcher = Blueprint('researcher', __name__)
 
 # home
 @researcher.route('/',  methods=['GET', 'POST'])
-@login_required
 @restrict_user(current_user, "Researcher") #TODO: FIX SIGN IN
+@login_required
 def researcher_home():
     # testing
 
@@ -81,12 +81,6 @@ def researcher_home():
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 
-@researcher.route('/file_count', methods=['GET'])
-def file_count():
-    # Gets the current counting of the files form session variable
-    file_count = session.get('file_count', 0)
-    return str(file_count)
-
 @researcher.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_project():
@@ -100,13 +94,6 @@ def create_project():
         return render_template('researcher/create.html', user=current_user)
     
     if request.method == "POST":
-
-        current_html = render_template('researcher/create.html', user=current_user)
-        print("current html: " + current_html)
-        pattern = r"<li[^>]*>"
-        matches = re.findall(pattern, current_html)
-        print("matches: ", matches)
-        print("n matches: ", len(matches))
 
         # Saving data request form into DB Project
         project_name = request.form.get('project_name')

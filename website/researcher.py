@@ -90,15 +90,9 @@ def researcher_home():
 def create_project():
 
     if request.method == "GET":
-        # PRINTS EVERY TIME AS TEST read_project(id) function
-        projects = Project.query.all()
-        print("Projects here: ", projects)
-        for p in projects:
-            print(read_project(p.project_id))
         return render_template('researcher/create.html', user=current_user)
     
     if request.method == "POST":
-
         # HOW TO LOAD A FILE CORRECTLY: CLICK 'Updload a file' and 
         # then SELECT all the files you need to load
         # Files must be PDF's and you can't select 1 by one, otherwise, counter will fail
@@ -117,11 +111,11 @@ def create_project():
         file_str = str(files)
         # print(file_str)
         num_files = len(files)
-        if num_files > 0 and file_str.count('FileStorage: ''') != 1:
-            print("Files ready to load: ", num_files)
+        if num_files > 0 and file_str.count("FileStorage: ''") != 1:
+            # print("Numero file da caricare: ", num_files)
+            flash("Numero di file da caricare: " + num_files, category='success')
         else:
-            print("No files loaded, numfiles: ", num_files -1)
-            flash("No files loaded", category="error")
+            flash("Nessun file da caricare", category="error")
             return redirect(url_for('researcher.create_project'))
 
         pdf_files = 0
@@ -129,7 +123,7 @@ def create_project():
         for file in files:
             extension = os.path.splitext(file.filename)[1]
             if extension.lower() != '.pdf':
-                flash('Upload only PDFs, pdf count: ' + str(pdf_files) + ' of ' + str(num_files), category='error')
+                flash('Caricare solo file PDF, n. pdf inseriti: ' + str(pdf_files) + ' su ' + str(num_files), category='error')
                 return render_template('researcher/create.html', user=current_user)
             pdf_files += 1
 
@@ -140,22 +134,21 @@ def create_project():
             # Wether a file si valid and was uploaded inside the form (files)
             if len(file.filename) == 0:
                 # flash error on /researcher/create.html
-                flash('This file was not loaded', category='error')
+                flash('Questo file non è stato caricato', category='error')
             else:
 
                 filename = secure_filename(file.filename)
                 folder_save_into = 'project_files'
 
-                # for TEST purposes, can change to id = 1, avoiding new dir(None)
                 sub_folder = str(project.project_id)
-                sub_folder = str(1)
+                # sub_folder = str(1) # for TEST change to id = 1, avoiding new dir(None)
                 path_save_into = os.path.join(folder_save_into, sub_folder)
                 if not os.path.exists(path_save_into):
                     os.makedirs(path_save_into)
 
                 path_to_file = os.path.join(path_save_into, filename)
                 if os.path.exists(path_to_file):
-                    flash('File: ' + str(filename) + ', already exists', category='error')
+                    flash('Il file: ' + str(filename) + ', esiste già nel progetto', category='error')
                     continue
 
                 # Create a document only if file does not already exists
@@ -168,7 +161,8 @@ def create_project():
                 file.save(os.path.join(path_save_into, filename))
                 i += 1
                 
-    flash('Project has been successfully created: ' + str(i) + " of " + str(total) + " files loaded", category='success')
+    flash('Progetto creato con successo: ', category='success')
+    flash(str(i) + " di " + str(total) + " file inseriti nel progetto", category='success')
 
     return render_template('researcher/create.html', user=current_user)
 
@@ -192,3 +186,5 @@ def view_project():
     }
 
     return render_template('researcher/project.html', user=current_user, project=project)
+
+

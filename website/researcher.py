@@ -8,6 +8,21 @@ from werkzeug.utils import secure_filename
 from . import db
 
 
+def print_Projects(s, e):
+    projects = Project.query.filter(Project.project_id.between(s, e)).all()
+    list_p = []
+    for p in projects:
+        i = Evaluation_Interval.query.filter_by(evaluation_interval_id=p.evaluation_interval_id).first()
+        r = Researcher.query.filter_by(id=p.researcher_id).first()
+        list_p.append([ p.project_id, p.name, p.description, p.status, 
+                        [i.evaluation_interval_id, i.start, i.end], 
+                        [r.id, r.email, r.username] ])
+    print("Projects here: ")
+    for elem in list_p:
+        print(elem)
+    return list_p
+
+
 def read_project(project_id):
     p = Project.query.filter_by(project_id=project_id).first()
     # making a list of the project info

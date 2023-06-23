@@ -55,6 +55,49 @@ def restrict_user(current_user, user_type):
         return decorated_function
     return decorator
 
+class CustomProject:
+    def __init__(self, project_id, name, description, researcher, documents):
+        self.id = project_id
+        self.name = name
+        self.description = description
+        self.researcher = researcher
+        self.documents = documents
+
+class CustomResearcher:
+            def __init__(self, r_id, name, username):
+                self.id = r_id
+                self.name = name
+                self.username = username
+
+class CustomDocuments:
+            def __init__(self, d_id, name):
+                self.id = d_id
+                self.name = name
+
+def read_test(project_id):
+    p = Project.query.filter_by(project_id=project_id).first()
+    r = Researcher.query.filter_by(id=p.researcher_id).first()
+    docs = Document.query.filter_by(project_id=project_id)
+    print("NAME : ", p.name)
+    # TODO fetch project from db with projct_id from request
+
+    researcher = CustomResearcher(r_id=r.id, name=r.email, username=r.username)
+
+    documents = []
+
+    for d in docs:
+        documents.append( CustomDocuments(d_id=d.document_id, name=d.file_name) )
+
+
+    project = CustomProject( project_id=p.project_id, name=p.name, description=p.description, 
+                            researcher=researcher,
+                            documents=documents
+    )
+
+    print("p.NAME : ", project.documents[0].name)
+
+    return project
+
 
 researcher = Blueprint('researcher', __name__)
 
@@ -65,7 +108,9 @@ researcher = Blueprint('researcher', __name__)
 @restrict_user(current_user, "Researcher") #TODO: FIX SIGN IN
 def researcher_home():
     # testing
-
+    p = read_test(20)
+    print("\n\n\n\n", p.name, "\n\n\n")
+    
     # get all project based on user id
     class zzz_project:
         def __init__(self, id, name, description, status):
@@ -178,30 +223,32 @@ def create_project():
 def view_project():
     project_id = request.args.get('project_id')
 
-    # TODO fetch project from db with projct_id from request
-    project = {
-        "id": 13,
-        "name": "Isola delle rose",
-        "description": "Isola di metallo senza regole fuori dai confini italiani.",
-        "researcher": {
-            id: 3242,
-            "name": "Mario Rossi",
-            "username": "mariorossi"
-        },
-        "documents": [{"id": 0, "name": "leggi.pdf"}, {"id": 1, "name": "costituzione.pdf"}, {"id": 2, "name": "infrastruttura.pdf"}]
-    }
-
     p = Project.query.filter_by(project_id=project_id).first()
     r = Researcher.query.filter_by(id=p.researcher_id).first()
     documents = Document.query.filter_by(project_id=project_id)
 
-    project = [p.project_id, p.name, p.description, 
-                [r.id, r.email, r.username],]
-    for d in documents:
-        dt = [d.document_id, d.filename]
-        project.append(dt)
+    # TODO fetch project from db with projct_id from request
+    p = Project.query.filter_by(project_id=project_id).first()
+    r = Researcher.query.filter_by(id=p.researcher_id).first()
+    docs = Document.query.filter_by(project_id=project_id)
+    print("NAME : ", p.name)
+    # TODO fetch project from db with projct_id from request
 
-    print(project)
+    researcher = CustomResearcher(r_id=r.id, name=r.email, username=r.username)
+
+    documents = []
+
+    for d in docs:
+        documents.append( CustomDocuments(d_id=d.document_id, name=d.file_name) )
+
+
+    project = CustomProject( project_id=p.project_id, name=p.name, description=p.description, 
+                            researcher=researcher,
+                            documents=documents
+    )
+
+    print("p.NAME : ", project.documents[0].name)
+    
 
     return render_template('researcher/project.html', user=current_user, project=project)
 

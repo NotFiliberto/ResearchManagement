@@ -78,23 +78,16 @@ def read_test(project_id):
     p = Project.query.filter_by(project_id=project_id).first()
     r = Researcher.query.filter_by(id=p.researcher_id).first()
     docs = Document.query.filter_by(project_id=project_id)
-    print("NAME : ", p.name)
-    # TODO fetch project from db with projct_id from request
 
     researcher = CustomResearcher(r_id=r.id, name=r.email, username=r.username)
-
     documents = []
-
     for d in docs:
         documents.append( CustomDocuments(d_id=d.document_id, name=d.file_name) )
-
 
     project = CustomProject( project_id=p.project_id, name=p.name, description=p.description, 
                             researcher=researcher,
                             documents=documents
     )
-
-    print("p.NAME : ", project.documents[0].name)
 
     return project
 

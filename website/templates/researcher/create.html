@@ -129,7 +129,7 @@
 
                                         <input id="hidden-input"
                                             type="file"
-                                            name="file"
+                                            name="files"
                                             multiple
                                             class="hidden" />
 
@@ -370,6 +370,12 @@
         }
     }
 
+    // print all selected files
+    document.getElementById("submit").onclick = () => {
+        //console.log(document.getElementById("hidden-input"))
+
+
+    }
     // clear entire selection
     document.getElementById("cancel").onclick = () => {
         while (gallery.children.length > 0) {

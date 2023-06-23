@@ -97,7 +97,7 @@ def create_project():
         db.session.add(project)
         db.session.commit()
 
-        files = request.files.getlist("file")
+        files = request.files.getlist("files")
 
         print("lunghezza:::",  len(request.files.getlist('file')))
 

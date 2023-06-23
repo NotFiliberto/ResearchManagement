@@ -43,7 +43,7 @@ def restrict_user(current_user, user_type):
             if not current_user or not current_user.__class__.__name__ == str(user_type):
                 flash('You need to be a ' + str(user_type) +
                       ' user to access that page', category='error')
-                return render_template('auth/signin.html')
+                return redirect(url_for('auth.sign_in'))
             return route_function(*args, **kwargs)
         return decorated_function
     return decorator
@@ -86,6 +86,7 @@ def researcher_home():
 
 @researcher.route('/create', methods=['GET', 'POST'])
 @login_required
+@restrict_user(current_user, "Researcher")
 def create_project():
 
     if request.method == "GET":
@@ -119,7 +120,7 @@ def create_project():
         if num_files > 0 and file_str.count('FileStorage: ''') != 1:
             print("Files ready to load: ", num_files)
         else:
-            print("No files loaded, numfiles: ", num_files)
+            print("No files loaded, numfiles: ", num_files -1)
             flash("No files loaded", category="error")
             return redirect(url_for('researcher.create_project'))
 

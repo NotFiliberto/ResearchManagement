@@ -18,8 +18,11 @@ app.config['MINIFY_HTML'] = True
 htmlmin = HTMLMIN(app)
 
 def read_project(project_id):
+
+    
     p = Project.query.filter_by(project_id=project_id).first()
     # making a list of the project info
+    print("read: ", p, " id: ", project_id)
     project_info = [p.project_id, p.name, p.status,
                     p.researcher_id, p.evaluation_interval_id]
     interval = Evaluation_Interval.query.filter_by(
@@ -184,6 +187,10 @@ def view_project():
         },
         "documents": [{"id": 0, "name": "leggi.pdf"}, {"id": 1, "name": "costituzione.pdf"}, {"id": 2, "name": "infrastruttura.pdf"}]
     }
+
+    project = read_project(project_id)
+
+    print("\project: ", project)
 
     return render_template('researcher/project.html', user=current_user, project=project)
 

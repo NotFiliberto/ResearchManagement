@@ -1,5 +1,5 @@
 from .models import Project, Researcher, Document, ProjectStatus, Evaluation_Interval
-from flask import redirect, flash, url_for
+from flask import flash, render_template
 from functools import wraps
 from collections import namedtuple
 
@@ -40,7 +40,7 @@ def restrict_user(current_user, user_type):
             if not current_user or not current_user.__class__.__name__ == str(user_type):
                 flash('You need to be a ' + str(user_type) +
                       ' user to access that page', category='error')
-                return redirect(url_for('auth.sign_in'))
+                return render_template('401.html')
             return route_function(*args, **kwargs)
         return decorated_function
     return decorator

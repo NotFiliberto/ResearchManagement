@@ -3,13 +3,15 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager  # essential for managing signed in users
 
 db = SQLAlchemy()
-DB_NAME = "database.db"
+DB_NAME = "database.db"  # TODO use .env
 
 
 def create_app():
     app = Flask(__name__)  # name of the file
 
-    app.config['SECRET_KEY'] = 'notFil6e660'  # use .env file in production
+    # TODO use .env file in production
+    app.config['SECRET_KEY'] = 'notFil6e660'
+
     # TODO change sqlite with postgressql (look up docs)
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
 
@@ -27,15 +29,10 @@ def create_app():
     app.register_blueprint(researcher, url_prefix='/researcher')
 
     # create db
-    from .models import User, Researcher
-
-
+    from .models import User
 
     with app.app_context():
         db.create_all()
-
-
-
 
     # setup flask login manager
     login_manager = LoginManager()  # create login manager

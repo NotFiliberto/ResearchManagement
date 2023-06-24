@@ -1,7 +1,7 @@
 from flask import Blueprint, flash, render_template, request
 from flask_login import login_required, current_user
 from website.models import Project, ProjectStatus
-from .utils import get_project
+from .utils import get_project, restrict_user
 
 
 evaluator = Blueprint('evaluator', __name__)
@@ -18,6 +18,7 @@ evaluator = Blueprint('evaluator', __name__)
 # home
 @evaluator.route('/',  methods=['GET', 'POST'])
 @login_required
+@restrict_user(current_user, "Evaluator")
 def evaluator_home():
     # get projects
     projects = Project.query.all()
@@ -26,6 +27,7 @@ def evaluator_home():
 
 @evaluator.route('/evaluate_project', methods=['GET', 'POST'])
 @login_required
+@restrict_user(current_user, "Evaluator")
 def evaluate_project():
 
     if request.method == "GET":
@@ -33,7 +35,7 @@ def evaluate_project():
         project = get_project(project_id)
 
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)
-    
+
     if request.method == "POST":
         flash("ok valutato", category="success")
         project_id = request.form.get('project_id')

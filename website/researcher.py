@@ -18,7 +18,7 @@ researcher = Blueprint('researcher', __name__)
 @restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
 def researcher_home():
     
-    projects = Project.query.filter_by(researcher_id=current_user.id)
+    projects = Project.query.filter_by(researcher_id=current_user.id).order_by(Project.project_id.desc())
 
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 

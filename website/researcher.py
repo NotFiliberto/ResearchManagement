@@ -17,29 +17,9 @@ researcher = Blueprint('researcher', __name__)
 @login_required
 @restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
 def researcher_home():
-    # testing
-
-    # get all project based on user id
-    class zzz_project:
-        def __init__(self, id, name, description, status):
-            self.project_id = id
-            self.name = name
-            self.description = description
-            self.status = status
-    projects = []
-    projects.append(zzz_project(
-        1, "Nome Progetto", "questa la descrizione inutile di questo progetto", ProjectStatus.NOT_APPROVED))
-    projects.append(zzz_project(
-        2, "l'isola di piume", "qsdafadsfadsf o", ProjectStatus.SUBMITTED_FOR_EVALUATION))
-    projects.append(zzz_project(
-        3, "napoli", "che dire follettini", ProjectStatus.REQUIRES_CHANGES))
-    projects.append(zzz_project(
-        4, "Spalletti's Town", "Uomini forti, destini forti, uomini deboli, destini deboli", ProjectStatus.APPROVED))
-
-    # pretty print projects
-    for project in projects:
-        print(str(project.__dict__))
-
+    
+    projects = Project.query.filter_by(researcher_id=current_user.id)
+    
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 
@@ -52,32 +32,22 @@ def create_project():
         return render_template('researcher/create.html', user=current_user)
     
     if request.method == "POST":
-        # HOW TO LOAD A FILE CORRECTLY: CLICK 'Updload a file' and 
-        # then SELECT all the files you need to load
-        # Files must be PDF's and you can't select 1 by one, otherwise, counter will fail
+        # Attention: SELECT all the files you need to load ALL AT ONCE (DON?T DRAG DROP)
+        # Files must be PDF's
 
         # Saving data request form into DB Project
         project_name = request.form.get('project_name')
         project_description = request.form.get('description')
 
-        # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
-        project = Project(name=project_name, description=project_description, evaluation_interval_id=1,
-                          researcher_id=current_user.id)
-        db.session.add(project)
-        db.session.commit()
-        
         # Check number of uploading files
         files = request.files.getlist("files")
         file_str = str(files)
         # print(file_str)
         num_files = len(files)
-        if num_files > 0 and file_str.count("FileStorage: ''") != 1:
-            # print("Numero file da caricare: ", num_files)
-            flash("Numero di file da caricare: " + str(num_files), category='success')
-        else:
-            flash("Nessun file da caricare", category="error")
+        if num_files == 0 or file_str.count("FileStorage: ''") == 1:
+            flash("Nessun file inserito", category="error")
             return redirect(url_for('researcher.create_project'))
-
+        
         pdf_files = 0
         # CHeck all files extension (PDF)
         for file in files:
@@ -86,6 +56,12 @@ def create_project():
                 flash('Caricare solo file PDF, n. pdf inseriti: ' + str(pdf_files) + ' su ' + str(num_files), category='error')
                 return render_template('researcher/create.html', user=current_user)
             pdf_files += 1
+
+        # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
+        project = Project(name=project_name, description=project_description, evaluation_interval_id=None,
+                          researcher_id=current_user.id)
+        db.session.add(project)
+        db.session.commit()
 
         # Iterate each file in the files List and save them
         i = 0
@@ -111,9 +87,8 @@ def create_project():
                     flash('Il file: ' + str(filename) + ', esiste già nel progetto', category='error')
                     continue
 
-                # Create a document only if file does not already exists
+                # Create a document only if file does not already exists, then ADD into DB
                 document = Document(file_extension=extension, file_name=file.filename, project_id=project.project_id)
-                # ADD Document into DB
                 db.session.add(document)
                 db.session.commit()
 
@@ -131,8 +106,13 @@ def create_project():
 def view_project():
 
     project_id = request.args.get('project_id')
-    project = get_project(project_id)
+    project = Project.query.filter_by(project_id=project_id).first()
+    if project is not None:
+        project = get_project(project_id)
+        return render_template('researcher/project.html', user=current_user, project=project)
     
-    return render_template('researcher/project.html', user=current_user, project=project)
+    flash('Non esistono progetti corrispondenti nel DB', category='error')
+    
+    return redirect(url_for('researcher.researcher_home'))
 
 

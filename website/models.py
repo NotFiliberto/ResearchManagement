@@ -59,6 +59,7 @@ class ProjectStatus(enum.Enum):
 class Project(db.Model):
     project_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
+    description = db.Column(db.String(500))
     status = db.Column(
         db.Enum(ProjectStatus, values_callable=lambda obj: [
                 e.value for e in obj]),
@@ -79,7 +80,6 @@ class Document(db.Model):
     document_id = db.Column(db.Integer, primary_key=True)
     file_extension = db.Column(db.String(10))
     file_name = db.Column(db.String(150))
-    topic = db.Column(db.String(150))
     project_id = db.Column(db.Integer, db.ForeignKey(
         'project.project_id'))
 

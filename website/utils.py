@@ -1,7 +1,8 @@
-from .models import Project, Researcher, Document, ProjectStatus, Evaluation_Interval
+from .models import Project, Report, Researcher, Document, ProjectStatus, Evaluation_Interval
 from flask import flash, render_template
 from functools import wraps
 from collections import namedtuple
+from . import db
 
 
 
@@ -44,4 +45,18 @@ def restrict_user(current_user, user_type):
             return route_function(*args, **kwargs)
         return decorated_function
     return decorator
+
+
+def create_report(document_id, evaluator_id, description):
+    report = Report(document_id=document_id, 
+                    evaluator_id=evaluator_id, 
+                    description=description)
+    db.session.add(report)
+    db.session.commit()
+
+    return report
+
+
+def download_document(document_id):
+    return "sus"
 

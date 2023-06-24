@@ -1,15 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
-
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-
 import enum
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey
 
 
 class User(db.Model, UserMixin):  # User class extends db.Model and UserMixin

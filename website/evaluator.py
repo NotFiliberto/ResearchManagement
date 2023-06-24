@@ -31,11 +31,10 @@ def evaluate_project():
     if request.method == "GET":
         project_id = request.args.get('project_id')
         # TODO fetch project from db with projct_id from request
-        project = get_project(project_id, "e")
+        project = get_project(project_id)
 
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)
     if request.method == "POST":
         flash("ok valutato", category="success")
-        print("\n\nID: ", project_id)
-        project = get_project(project_id, "e")
+        project = get_project(project_id)
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)

@@ -131,7 +131,7 @@ def create_project():
 def view_project():
 
     project_id = request.args.get('project_id')
-    project = get_project(project_id, "r")
+    project = get_project(project_id)
     
     return render_template('researcher/project.html', user=current_user, project=project)
 

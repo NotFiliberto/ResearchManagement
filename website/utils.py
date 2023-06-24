@@ -48,18 +48,19 @@ def e_definition(p, researcher, documents):
                             documents=documents)
 
 
-def get_project(project_id, definition):
+def get_project(project_id):
     p = Project.query.filter_by(project_id=project_id).first()
     r = Researcher.query.filter_by(id=p.researcher_id).first()
     docs = Document.query.filter_by(project_id=project_id)
     researcher = CustomResearcher(r_id=r.id, name=r.email, username=r.username)
     documents = []
+    
     for d in docs:
         documents.append( CustomDocuments(d_id=d.document_id, name=d.file_name) )
-    if definition == "r":
-        return r_definition(p, researcher, documents)
-    if definition == "e":
-        return e_definition(p, researcher, documents)
+
+    return CustomProject1( project_id=p.project_id, name=p.name, description=p.description, 
+                            researcher=researcher,
+                            documents=documents)
 
 
 def restrict_user(current_user, user_type):

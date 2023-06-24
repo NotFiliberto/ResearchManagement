@@ -86,7 +86,7 @@ class Document(db.Model):
 
 class Report(db.Model):
     report_id = db.Column(db.Integer, primary_key=True)
-    db.Column(
+    evaluator_id = db.Column(
         db.Integer, db.ForeignKey('evaluator.id'))
     document_id = db.Column(
         db.Integer, db.ForeignKey('document.document_id'))

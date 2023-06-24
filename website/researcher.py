@@ -102,8 +102,8 @@ def create_project():
 
 
 @researcher.route('/project', methods=['GET', 'POST'])
-@restrict_user(current_user, "Researcher")
 @login_required
+@restrict_user(current_user, "Researcher")
 def view_project():
 
     project_id = request.args.get('project_id')

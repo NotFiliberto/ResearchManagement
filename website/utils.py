@@ -13,11 +13,11 @@ class CustomProject1:
 
 
 class CustomProject2:
-    def __init__(self, project_id, name, description, status, researcher, documents):
+    def __init__(self, project_id, name, status, description, researcher, documents):
         self.id = project_id
         self.name = name
-        self.description = description
         self.status = status
+        self.description = description
         self.researcher = researcher
         self.documents = documents
 
@@ -35,41 +35,31 @@ class CustomDocuments:
                 self.name = name
 
 
-def get_Researcher_Project(project_id):
-    
-    p = Project.query.filter_by(project_id=project_id).first()
-    r = Researcher.query.filter_by(id=p.researcher_id).first()
-    docs = Document.query.filter_by(project_id=project_id)
-
-    researcher = CustomResearcher(r_id=r.id, name=r.email, username=r.username)
-    documents = []
-    for d in docs:
-        documents.append( CustomDocuments(d_id=d.document_id, name=d.file_name) )
-
-    project = CustomProject1( project_id=p.project_id, name=p.name, description=p.description, 
+def r_definition(p, researcher, documents):
+    return CustomProject1( project_id=p.project_id, name=p.name, description=p.description, 
                             researcher=researcher,
-                            documents=documents
-    )
-
-    return project
-
-
-def get_Evaluator_Project(project_id):
-
-    p = Project.query.filter_by(project_id=project_id).first()
-    r = Researcher.query.filter_by(id=p.researcher_id).first()
-    docs = Document.query.filter_by(project_id=project_id)
-
-    researcher = CustomResearcher(r_id=r.id, name=r.email, username=r.username)
-    documents = []
-    for d in docs:
-        documents.append( CustomDocuments(d_id=d.document_id, name=d.file_name) )
-    
-    project = CustomProject2(project_id=p.project_id, name=p.name, description=p.description, status=ProjectStatus.SUBMITTED_FOR_EVALUATION, 
-                            researcher=researcher, 
                             documents=documents)
 
-    return project
+
+def e_definition(p, researcher, documents):
+    return CustomProject2( project_id=p.project_id, name=p.name, 
+                          status=ProjectStatus.SUBMITTED_FOR_EVALUATION, description=p.description, 
+                            researcher=researcher,
+                            documents=documents)
+
+
+def get_project(project_id, definition):
+    p = Project.query.filter_by(project_id=project_id).first()
+    r = Researcher.query.filter_by(id=p.researcher_id).first()
+    docs = Document.query.filter_by(project_id=project_id)
+    researcher = CustomResearcher(r_id=r.id, name=r.email, username=r.username)
+    documents = []
+    for d in docs:
+        documents.append( CustomDocuments(d_id=d.document_id, name=d.file_name) )
+    if definition == "r":
+        return r_definition(p, researcher, documents)
+    if definition == "e":
+        return e_definition(p, researcher, documents)
 
 
 def restrict_user(current_user, user_type):
@@ -86,7 +76,7 @@ def restrict_user(current_user, user_type):
     return decorator
 
 
-def print_Projects(s, e):
+def print_projects(s, e):
     projects = Project.query.filter(Project.project_id.between(s, e)).all()
     list_p = []
     for p in projects:

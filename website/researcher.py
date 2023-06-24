@@ -5,8 +5,7 @@ from flask import Flask
 from flask_login import login_required, current_user
 from .models import Project, ProjectStatus, Document
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_Researcher_Project
-
+from .utils import restrict_user, get_project
 
 
 
@@ -20,23 +19,22 @@ researcher = Blueprint('researcher', __name__)
 def researcher_home():
     # testing
 
-    
     # get all project based on user id
     class zzz_project:
         def __init__(self, id, name, description, status):
-            self.id = id
+            self.project_id = id
             self.name = name
             self.description = description
             self.status = status
     projects = []
     projects.append(zzz_project(
-        0, "Nome Progetto", "questa la descrizione inutile di questo progetto", ProjectStatus.NOT_APPROVED))
+        1, "Nome Progetto", "questa la descrizione inutile di questo progetto", ProjectStatus.NOT_APPROVED))
     projects.append(zzz_project(
-        1, "l'isola di piume", "qsdafadsfadsf o", ProjectStatus.SUBMITTED_FOR_EVALUATION))
+        2, "l'isola di piume", "qsdafadsfadsf o", ProjectStatus.SUBMITTED_FOR_EVALUATION))
     projects.append(zzz_project(
-        2, "napoli", "che dire follettini", ProjectStatus.REQUIRES_CHANGES))
+        3, "napoli", "che dire follettini", ProjectStatus.REQUIRES_CHANGES))
     projects.append(zzz_project(
-        3, "Spalletti's Town", "Uomini forti, destini forti, uomini deboli, destini deboli", ProjectStatus.APPROVED))
+        4, "Spalletti's Town", "Uomini forti, destini forti, uomini deboli, destini deboli", ProjectStatus.APPROVED))
 
     # pretty print projects
     for project in projects:
@@ -130,10 +128,10 @@ def create_project():
 
 @researcher.route('/project', methods=['GET', 'POST'])
 @login_required
-def get_project():
+def view_project():
 
     project_id = request.args.get('project_id')
-    project = get_Researcher_Project(project_id)
+    project = get_project(project_id, "r")
     
     return render_template('researcher/project.html', user=current_user, project=project)
 

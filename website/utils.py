@@ -57,6 +57,3 @@ def create_report(document_id, evaluator_id, description):
     return report
 
 
-def download_document(document_id):
-    return "sus"
-

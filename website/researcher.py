@@ -58,7 +58,10 @@ def create_project():
             pdf_files += 1
 
         # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
-        project = Project(name=project_name, description=project_description, evaluation_interval_id=None,
+        project = Project(name=project_name, 
+                          description=project_description, 
+                          evaluation_interval_id=None,
+                          status=ProjectStatus.SUBMITTED_FOR_EVALUATION,
                           researcher_id=current_user.id)
         db.session.add(project)
         db.session.commit()

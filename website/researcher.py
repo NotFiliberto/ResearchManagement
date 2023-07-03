@@ -5,7 +5,7 @@ from flask import Flask
 from flask_login import login_required, current_user
 from .models import Project, ProjectStatus, Document, Report
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_project, get_report, create_report
+from .utils import restrict_user, get_project, create_report
 
 
 

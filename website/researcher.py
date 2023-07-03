@@ -3,9 +3,9 @@ from . import db
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask import Flask
 from flask_login import login_required, current_user
-from .models import Project, ProjectStatus, Document
+from .models import Project, ProjectStatus, Document, Report
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_project
+from .utils import restrict_user, get_project, get_report, create_report
 
 
 
@@ -19,6 +19,8 @@ researcher = Blueprint('researcher', __name__)
 def researcher_home():
     
     projects = Project.query.filter_by(researcher_id=current_user.id).order_by(Project.project_id.desc())
+    # researcher can also see all the reports of the projects where project.status == (richiede modifiche or in attesa)
+    
 
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 

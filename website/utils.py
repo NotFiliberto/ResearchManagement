@@ -1,5 +1,6 @@
+import os
 from .models import Project, Researcher, Document, ProjectStatus, Evaluation_Interval, Report
-from flask import redirect, flash, render_template, url_for
+from flask import redirect, url_for
 from functools import wraps
 from collections import namedtuple
 from . import db
@@ -53,3 +54,25 @@ def create_report(document_id, evaluator_id, description):
     db.session.commit()
 
     return report
+
+
+def download_document(document_id):
+    d = Document.query.filter_by(document_id=document_id).first()
+    file_name = d.file_name
+    file_name = file_name.replace(" ", "_")
+    sub = str(d.project_id)
+    # current path (.py file is stored in website folder)
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    # Absolute path outside current path(website) -> current path - 1 
+    outside_website = os.path.dirname(current_path)
+    # Folder name of which contains all the projects
+    file_folder_name = 'project_files'
+    # path to the folder 
+    folder_outside = os.path.join(outside_website, file_folder_name) 
+    # path to the subfolder
+    subfolder_path = os.path.join(folder_outside, sub)
+    # path to file
+    file_path = os.path.join(subfolder_path, file_name)
+    # return the file path and ONY then you can send the file as a return 
+    return file_path
+

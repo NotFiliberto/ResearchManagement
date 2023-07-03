@@ -55,7 +55,7 @@ def create_project():
         for file in files:
             extension = os.path.splitext(file.filename)[1]
             if extension.lower() != '.pdf':
-                flash('Caricare solo file PDF, n. pdf inseriti: ' + str(pdf_files) + ' su ' + str(num_files), category='error')
+                flash('Caricare solo file PDF, n. pdf selezionati: ' + str(pdf_files) + ' su ' + str(num_files), category='error')
                 return render_template('researcher/create.html', user=current_user)
             pdf_files += 1
 
@@ -101,7 +101,7 @@ def create_project():
                 i += 1
                 
     flash('Progetto creato con successo: ', category='success')
-    flash(str(i) + " di " + str(total) + " file inseriti nel progetto", category='success')
+    flash(str(i) + " di " + str(total) + " file caricati correttamente", category='success')
 
     return render_template('researcher/create.html', user=current_user)
 

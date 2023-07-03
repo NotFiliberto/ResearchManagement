@@ -3,9 +3,9 @@ from . import db
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask import Flask
 from flask_login import login_required, current_user
-from .models import Project, ProjectStatus, Document
+from .models import Project, ProjectStatus, Document, Report
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_project
+from .utils import restrict_user, get_project, create_report
 
 
 
@@ -18,7 +18,9 @@ researcher = Blueprint('researcher', __name__)
 @restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
 def researcher_home():
     
-    projects = Project.query.filter_by(researcher_id=current_user.id)
+    projects = Project.query.filter_by(researcher_id=current_user.id).order_by(Project.project_id.desc())
+    # researcher can also see all the reports of the projects where project.status == (richiede modifiche or in attesa)
+    
 
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
@@ -58,7 +60,10 @@ def create_project():
             pdf_files += 1
 
         # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
-        project = Project(name=project_name, description=project_description, evaluation_interval_id=None,
+        project = Project(name=project_name, 
+                          description=project_description, 
+                          evaluation_interval_id=None,
+                          status=ProjectStatus.SUBMITTED_FOR_EVALUATION,
                           researcher_id=current_user.id)
         db.session.add(project)
         db.session.commit()

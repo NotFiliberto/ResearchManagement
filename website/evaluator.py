@@ -8,11 +8,6 @@ evaluator = Blueprint('evaluator', __name__)
 
 # TODO route per i projects con def metodi crud:
 #  create(idProgetto, ricercatore), read(ricercatore, valutatore), update, delete  (crud operations)
-# sempre controllare che chi fa un'operazione debba essere loggato (prima)
-# per fare create -> /root/create : se il metodo è GET reinderizzi sulla pagina createProject.html
-# se il metodo è POST (if requested.method == "POST"), returno la stringa che
-#  il progetto è stato creato con successo
-# tutte  le route sono renderizzate da una cartella apposita fuori da website
 
 
 # home
@@ -21,7 +16,7 @@ evaluator = Blueprint('evaluator', __name__)
 @restrict_user(current_user, "Evaluator")
 def evaluator_home():
     # get projects
-    projects = Project.query.all()
+    projects = Project.query.order_by(Project.project_id.desc()).all()
     return render_template('evaluator/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 

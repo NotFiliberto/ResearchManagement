@@ -61,8 +61,11 @@
                             <div class="flex text-sm leading-6 text-gray-900 ">
                                 <label for="{{document.name}}"
                                     class="font-medium">{{document.name}}</label>
-                                <a href="{{ url_for('document.download', document_id=document.id) }}"
-                                    class="flex-auto text-right text-indigo-600">scarica</a>
+                                <div class="flex-auto text-right ">
+                                    <a href="{{ url_for('document.download', document_id=document.id) }}"
+                                        class="text-indigo-600">scarica</a>
+                                </div>
+
                             </div>
 
                             <div class="mt-2">

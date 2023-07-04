@@ -113,13 +113,16 @@ def create_project():
 @login_required
 @restrict_user(current_user, "Researcher")
 def view_project():
+    if request.method == "GET":
+        project_id = request.args.get('project_id')
+        project = Project.query.filter_by(project_id=project_id).first()
+        if project is not None:
+            project = get_project(project_id)
+            return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
 
-    project_id = request.args.get('project_id')
-    project = Project.query.filter_by(project_id=project_id).first()
-    if project is not None:
-        project = get_project(project_id)
-        return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
+        flash('Non esistono progetti corrispondenti nel DB', category='error')
 
-    flash('Non esistono progetti corrispondenti nel DB', category='error')
-
-    return redirect(url_for('researcher.researcher_home'))
+        return redirect(url_for('researcher.researcher_home'))
+    if request.method == "POST":
+        # TODO re-upload
+        return redirect(url_for('researcher.researcher_home'))

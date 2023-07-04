@@ -1,4 +1,6 @@
 import os
+
+from sqlalchemy import or_
 from . import db
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask import Flask
@@ -16,11 +18,14 @@ researcher = Blueprint('researcher', __name__)
 @login_required
 @restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
 def researcher_home():
-
-    projects = Project.query.filter_by(
-        researcher_id=current_user.id).order_by(Project.project_id.desc())
-    # researcher can also see all the reports of the projects where project.status == (richiede modifiche or in attesa)
-
+    # researcher can see all the reports of the projects where 
+    # project.status == (richiede modifiche or in attesa)
+    projects = Project.query.filter(
+        Project.researcher_id == current_user.id, or_(
+        Project.status == ProjectStatus.SUBMITTED_FOR_EVALUATION,
+        Project.status == ProjectStatus.REQUIRES_CHANGES
+    )).order_by(Project.project_id.desc())
+    
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 

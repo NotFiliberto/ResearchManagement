@@ -1,7 +1,7 @@
 from flask import Blueprint, flash, render_template, request
 from flask_login import login_required, current_user
 from website.models import Project, ProjectStatus
-from .utils import get_project, restrict_user, change_project_state, create_report, get_report
+from .utils import get_project, restrict_user, change_project_state, create_report, get_reports
 from . import db
 
 

@@ -2,7 +2,7 @@ from flask import Blueprint, flash, redirect, render_template, request, send_fil
 from flask_login import login_required, current_user
 from website.models import Document
 from website.models import Project, ProjectStatus
-from .utils import get_project, restrict_user, download_document, download_zip_documents
+from .utils import download_document
 
 
 document = Blueprint('document', __name__)

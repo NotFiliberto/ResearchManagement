@@ -19,7 +19,6 @@ def get_project(project_id):
                    'status', 'researcher', 'documents'])
     Res = namedtuple('R', ['id', 'name', 'username'])
     D = namedtuple('D', ['id', 'name', 'report'])
-    Dno = namedtuple('D', ['id', 'name'])
     REP = namedtuple('REP', ['id', 'evaluator_id', 'document_id', 'description'])
     # create a researcher object to assign to its project obj
     res = Res(id=r.id, name=r.email, username=r.username)
@@ -30,9 +29,9 @@ def get_project(project_id):
         if project_rep is not None:  
             rep = REP(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id, 
                 document_id=project_id.document_id, description=project_rep.description)
-            dd = D(id=d.document_id, name=d.file_name, report=rep)
         else: 
-            dd = Dno(id=d.document_id, name=d.file_name)
+            rep = None
+        dd = D(id=d.document_id, name=d.file_name, report=rep)
         documents.append(dd)
     # Assign each project attribute, researcher and documents included
     project = P(id=p.project_id,
@@ -77,7 +76,8 @@ def get_reports(project_id):
     p = get_project(project_id)
     reports = []
     for d in p.documents:
-        reports.append(d.report)
+        if d.report is not None:
+            reports.append(d.report)
 
     return reports
 

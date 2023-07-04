@@ -39,18 +39,50 @@
     <div class=" py-5">
         <!-- Heading progetti -->
 
-        <div class="py-12" />
+        <div class="py-6" />
 
-        <div class="">
-            <div class=" inset-0 flex items-center"
-                aria-hidden="true">
-                <div class="w-full border-t border-gray-300">
-                    dsf
+        <div class="py-2">
+            <h1 class="text-xl  font-semibold">Documenti sottomessi</h1>
+            <p class="italic py-2">Qua puoi vedere lo stato attuale del progetto e degli eventuali report di
+                valutazioni per i documenti che hai sottomesso.</p>
+        </div>
+        <div class=" inset-0 flex items-center"
+            aria-hidden="true">
+            <div class="w-full border-t border-gray-300">
+                {% for document in project.documents %}
+                <div class="py-2.5 w-full">
+                    <div class="flex text-sm leading-6 text-gray-900 ">
+                        <label for="{{document.name}}"
+                            class="text-base font-semibold leading-7 text-gray-900">{{document.name}}</label>
+                        <div class="flex-auto text-right ">
+                            <a href="{{ url_for('document.download', document_id=document.id) }}"
+                                class="text-indigo-600">scarica</a>
+                        </div>
+
+                    </div>
+
+                    {% if (document.report is not none) %}
+                    <div class="mt-2 text-base leading-7 text-gray-600">
+                        {{document.report.description}}
+                    </div>
+                    {% else %}
+                    <div class="mt-2 text-base leading-7 text-gray-600">
+                        Documento in attesa di valutazione...
+                    </div>
+                    {% endif %}
+
                 </div>
+                {% endfor %}
             </div>
         </div>
+
         <div class="py-12" />
 
+        {% if project.status == project_statuses.REQUIRES_CHANGES %}
+        {% with form_name_reference="files", submit_button_text="Richiedi nuova valutazione" %}
+        {% include 'file_uploader.html' %}
+        {% endwith %}
+        {% endif %}
 
     </div>
 </div>

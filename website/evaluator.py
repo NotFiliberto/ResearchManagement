@@ -1,7 +1,8 @@
 from flask import Blueprint, flash, render_template, request
 from flask_login import login_required, current_user
 from website.models import Project, ProjectStatus
-from .utils import get_project, restrict_user
+from .utils import get_project, restrict_user, changeState, create_report, get_report
+from . import db
 
 
 evaluator = Blueprint('evaluator', __name__)
@@ -33,6 +34,19 @@ def evaluate_project():
 
     if request.method == "POST":
         flash("ok valutato", category="success")
+        #get data from html page
+        status = request.form.get('project_status')
         project_id = request.form.get('project_id')
+        # get project
         project = get_project(project_id)
+        # set the new status given by evaluator
+        changeState(status, project)
+        # for each document, create a report
+        i = 0
+        for d in project.documents:
+            # gets the n-ary text area
+            description = request.form.get('text-area' + str(i))
+            # create_report(d.id, current_user, description)
+            i += 1
+
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)

@@ -8,7 +8,6 @@ from werkzeug.utils import secure_filename
 from .utils import restrict_user, get_project, create_report
 
 
-
 researcher = Blueprint('researcher', __name__)
 
 
@@ -17,10 +16,10 @@ researcher = Blueprint('researcher', __name__)
 @login_required
 @restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
 def researcher_home():
-    
-    projects = Project.query.filter_by(researcher_id=current_user.id).order_by(Project.project_id.desc())
+
+    projects = Project.query.filter_by(
+        researcher_id=current_user.id).order_by(Project.project_id.desc())
     # researcher can also see all the reports of the projects where project.status == (richiede modifiche or in attesa)
-    
 
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
@@ -32,7 +31,7 @@ def create_project():
 
     if request.method == "GET":
         return render_template('researcher/create.html', user=current_user)
-    
+
     if request.method == "POST":
         # Attention: SELECT all the files you need to load ALL AT ONCE (DON?T DRAG DROP)
         # Files must be PDF's
@@ -49,19 +48,20 @@ def create_project():
         if num_files == 0 or file_str.count("FileStorage: ''") == 1:
             flash("Nessun file inserito", category="error")
             return redirect(url_for('researcher.create_project'))
-        
+
         pdf_files = 0
         # CHeck all files extension (PDF)
         for file in files:
             extension = os.path.splitext(file.filename)[1]
             if extension.lower() != '.pdf':
-                flash('Caricare solo file PDF, n. pdf selezionati: ' + str(pdf_files) + ' su ' + str(num_files), category='error')
+                flash('Caricare solo file PDF, n. pdf selezionati: ' +
+                      str(pdf_files) + ' su ' + str(num_files), category='error')
                 return render_template('researcher/create.html', user=current_user)
             pdf_files += 1
 
         # Creating DB Project (ATTENTION EV_INTERVAL=1 TEMPORARY VALUE TESTING)
-        project = Project(name=project_name, 
-                          description=project_description, 
+        project = Project(name=project_name,
+                          description=project_description,
                           evaluation_interval_id=None,
                           status=ProjectStatus.SUBMITTED_FOR_EVALUATION,
                           researcher_id=current_user.id)
@@ -89,19 +89,22 @@ def create_project():
 
                 path_to_file = os.path.join(path_save_into, filename)
                 if os.path.exists(path_to_file):
-                    flash('Il file: ' + str(filename) + ', esiste già nel progetto', category='error')
+                    flash('Il file: ' + str(filename) +
+                          ', esiste già nel progetto', category='error')
                     continue
 
                 # Create a document only if file does not already exists, then ADD into DB
-                document = Document(file_extension=extension, file_name=file.filename, project_id=project.project_id)
+                document = Document(
+                    file_extension=extension, file_name=file.filename, project_id=project.project_id)
                 db.session.add(document)
                 db.session.commit()
 
                 file.save(os.path.join(path_save_into, filename))
                 i += 1
-                
+
     flash('Progetto creato con successo: ', category='success')
-    flash(str(i) + " di " + str(total) + " file caricati correttamente", category='success')
+    flash(str(i) + " di " + str(total) +
+          " file caricati correttamente", category='success')
 
     return render_template('researcher/create.html', user=current_user)
 
@@ -115,10 +118,8 @@ def view_project():
     project = Project.query.filter_by(project_id=project_id).first()
     if project is not None:
         project = get_project(project_id)
-        return render_template('researcher/project.html', user=current_user, project=project)
-    
+        return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
+
     flash('Non esistono progetti corrispondenti nel DB', category='error')
-    
+
     return redirect(url_for('researcher.researcher_home'))
-
-

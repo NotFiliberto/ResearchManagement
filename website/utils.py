@@ -55,7 +55,7 @@ def restrict_user(current_user, user_type):
     return decorator
 
 # tested
-def changeState(status, project):
+def change_project_state(status, project):
     if status != project.status:
         p = Project.query.filter_by(project_id=project.id).first()
         p.status = status
@@ -71,7 +71,7 @@ def create_report(document_id, evaluator_id, description):
     return report
 
 # tested
-def get_report(project_id):
+def get_reports(project_id):
     p = get_project(project_id)
     reports = []
     for d in p.documents:

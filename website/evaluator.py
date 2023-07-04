@@ -1,7 +1,7 @@
 from flask import Blueprint, flash, render_template, request
 from flask_login import login_required, current_user
 from website.models import Project, ProjectStatus
-from .utils import get_project, restrict_user, changeState, create_report, get_report
+from .utils import get_project, restrict_user, change_project_state, create_report, get_report
 from . import db
 
 
@@ -40,7 +40,7 @@ def evaluate_project():
         # get project
         project = get_project(project_id)
         # set the new status given by evaluator
-        changeState(status, project)
+        change_project_state(status, project)
         # for each document, create a report
         i = 0
         for d in project.documents:

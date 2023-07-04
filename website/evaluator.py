@@ -1,8 +1,8 @@
 from flask import Blueprint, flash, render_template, request
 from flask_login import login_required, current_user
-from website.models import Project, ProjectStatus
+from website.models import Project, ProjectStatus, Report
 from .utils import get_project, restrict_user, change_project_state, create_report, get_reports
-
+from . import db
 
 evaluator = Blueprint('evaluator', __name__)
 
@@ -29,6 +29,11 @@ def evaluate_project():
         project_id = request.args.get('project_id')
         project = get_project(project_id)
 
+        reports = Report.query.all()
+        print("\nREPS: ", reports, "\n")
+        for rep in reports:
+            print("rep(id, evID, docID, descr): ", rep.report_id, rep.evaluator_id, rep.document_id, rep.description)        
+
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)
 
     if request.method == "POST":
@@ -44,8 +49,9 @@ def evaluate_project():
         i = 0
         for d in project.documents:
             # gets the n-ary text area
-            description = request.form.get('text-area' + str(i))
-            # create_report(d.id, current_user, description)
+            description = request.form['document_' + str(d.id)]
+            print("\nDESCRISCPTION: ", description, "\n")
+            create_report(d.id, current_user.id, description)
             i += 1
 
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)

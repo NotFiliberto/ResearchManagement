@@ -2,7 +2,7 @@ import io
 import os
 import zipfile
 from .models import Project, Researcher, Document, ProjectStatus, Evaluation_Interval, Report
-from flask import redirect, url_for
+from flask import redirect, url_for, request, flash
 from functools import wraps
 from collections import namedtuple
 from . import db
@@ -28,7 +28,7 @@ def get_project(project_id):
         project_rep = Report.query.filter_by(document_id=d.document_id).first()
         if project_rep is not None:  
             rep = REP(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id, 
-                document_id=project_id.document_id, description=project_rep.description)
+                document_id=project_rep.document_id, description=project_rep.description)
         else: 
             rep = None
         dd = D(id=d.document_id, name=d.file_name, report=rep)
@@ -64,12 +64,21 @@ def change_project_state(status, project):
 
 # tested
 def create_report(document_id, evaluator_id, description):
-    report = Report(document_id=document_id, 
-                    evaluator_id=evaluator_id, 
-                    description=description)
-    db.session.add(report)
-    db.session.commit()
-    return report
+    doc = Document.query.filter_by(document_id=document_id).first()
+    checkExisting = Report.query.filter_by(document_id=document_id).first()
+    if checkExisting is None and doc is not None :
+        # if document has not already a report, create it
+        report = Report(document_id=document_id, 
+                        evaluator_id=evaluator_id, 
+                        description=description)
+        db.session.add(report)
+        db.session.commit()
+        return report
+    elif checkExisting is not None and doc is not None:
+        # otherwise, only update the description
+        checkExisting.description = description
+        db.session.commit()
+    return None
 
 # tested
 def get_reports(project_id):
@@ -133,4 +142,38 @@ def download_zip_documents(project_id):
     # 
     # return send_file(zip_buffer, as_attachment=True, attachment_filename=name)
     # -> da mettere ogni volta in una route function si richiama la download zip
-    
+
+# to test
+def re_upload(document_id):
+    doc = Document.query.filter_by(document_id=document_id).first()
+    sub = str(doc.project_id)
+    file_name = doc.file_name
+
+    # current path (.py file is stored in website folder)
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    # Absolute path outside current path(website) -> current path - 1 
+    outside_website = os.path.dirname(current_path)
+    # Folder name of which contains all the projects
+    file_folder_name = 'project_files'
+    # path to the folder 
+    folder_outside = os.path.join(outside_website, file_folder_name) 
+    # path to the subfolder
+    subfolder_path = os.path.join(folder_outside, sub)
+    # build entire file path
+    file_path = os.path.join(subfolder_path, file_name)
+
+    if os.path.exists(file_path):
+        # if file exists I need to reload it (delete the old one
+        # and add the new one -> SAME file_name)
+        os.remove(file_path)
+        file = request.files.getlist("files")
+        file.save(file_path)
+        print("Il file esiste nella cartella.")
+    else:
+        # è un problema se il file non esiste già perchè 
+        # il file è da sostituire, quindi prima per forza deve esistere
+        flash('Il file da ricaricare non esiste', category='error')
+        return redirect(url_for('researcher.view_project'))
+
+    return redirect(url_for('document.reload_document'))
+

@@ -10,29 +10,31 @@ from . import db
 
 # tested, added documents[i].report
 def get_project(project_id):
+    # getting info from queries
     p = Project.query.filter_by(project_id=project_id).first()
     r = Researcher.query.filter_by(id=p.researcher_id).first()
     docs = Document.query.filter_by(project_id=project_id)
-
+    # creating new models for project obj
     P = namedtuple('P', ['id', 'name', 'description',
                    'status', 'researcher', 'documents'])
-    R = namedtuple('R', ['id', 'name', 'username'])
+    Res = namedtuple('R', ['id', 'name', 'username'])
     D = namedtuple('D', ['id', 'name', 'report'])
+    Dno = namedtuple('D', ['id', 'name'])
     REP = namedtuple('REP', ['id', 'evaluator_id', 'document_id', 'description'])
-
-    res = R(id=r.id, name=r.email, username=r.username)
-
+    # create a researcher object to assign to its project obj
+    res = Res(id=r.id, name=r.email, username=r.username)
+    # create a document list to assign to its project obj
     documents = []
     for d in docs:
         project_rep = Report.query.filter_by(document_id=d.document_id).first()
         if project_rep is not None:  
-            rep = R(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id, 
+            rep = REP(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id, 
                 document_id=project_id.document_id, description=project_rep.description)
+            dd = D(id=d.document_id, name=d.file_name, report=rep)
         else: 
-            rep = None
-        dd = D(id=d.document_id, name=d.file_name, report=rep)
+            dd = Dno(id=d.document_id, name=d.file_name)
         documents.append(dd)
-
+    # Assign each project attribute, researcher and documents included
     project = P(id=p.project_id,
                 name=p.name,
                 description=p.description,

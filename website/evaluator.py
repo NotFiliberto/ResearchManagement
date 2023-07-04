@@ -16,7 +16,7 @@ evaluator = Blueprint('evaluator', __name__)
 @restrict_user(current_user, "Evaluator")
 def evaluator_home():
     # get projects
-    projects = Project.query.order_by(Project.project_id.desc()).all()
+    projects = Project.query.filter_by(status=ProjectStatus.SUBMITTED_FOR_EVALUATION).order_by(Project.project_id.desc()).all()
     return render_template('evaluator/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 
@@ -41,7 +41,7 @@ def evaluate_project():
         #get data from html page
         status = request.form.get('project_status')
         project_id = request.form.get('project_id')
-        # get project
+        # get all project
         project = get_project(project_id)
         # set the new status given by evaluator
         change_project_state(status, project)
@@ -54,4 +54,7 @@ def evaluate_project():
             create_report(d.id, current_user.id, description)
             i += 1
 
-        return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)
+        projects = Project.query.order_by(Project.project_id.desc()).all()
+
+        return render_template('evaluator/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
+

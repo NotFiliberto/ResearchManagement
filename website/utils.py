@@ -95,7 +95,6 @@ def get_reports(project_id):
 def download_document(document_id):
     d = Document.query.filter_by(document_id=document_id).first()
     file_name = d.file_name
-    file_name = file_name.replace(" ", "_")
     sub = str(d.project_id)
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -165,5 +164,4 @@ def re_upload(doc):
     os.remove(file_path)
     # return file_path and use it to save the file in that path
     return file_path
-
 

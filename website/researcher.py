@@ -125,4 +125,7 @@ def view_project():
         return redirect(url_for('researcher.researcher_home'))
     if request.method == "POST":
         # TODO re-upload
+        files = request.files.getlist("files")
+        print(files)
+        print("RE-UPLOAD LOGIC HERE")
         return redirect(url_for('researcher.researcher_home'))

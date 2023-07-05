@@ -7,7 +7,7 @@ from flask import Flask
 from flask_login import login_required, current_user
 from .models import Project, ProjectStatus, Document, Report
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_project, create_report
+from .utils import restrict_user, get_project, create_report, re_upload
 
 
 researcher = Blueprint('researcher', __name__)
@@ -116,16 +116,49 @@ def view_project():
     if request.method == "GET":
         project_id = request.args.get('project_id')
         project = Project.query.filter_by(project_id=project_id).first()
+        print("\n\n PR ID and PR: ", project_id, " + ", project)
         if project is not None:
             project = get_project(project_id)
-            return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
-
-        flash('Non esistono progetti corrispondenti nel DB', category='error')
-
-        return redirect(url_for('researcher.researcher_home'))
+        else:
+            flash('Non esistono progetti corrispondenti nel DB', category='error')
+        return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
+    
     if request.method == "POST":
-        # TODO re-upload
-        files = request.files.getlist("files")
-        print(files)
-        print("RE-UPLOAD LOGIC HERE")
-        return redirect(url_for('researcher.researcher_home'))
+        return redirect(url_for('researcher.re_upload_documents', user=current_user, project=project, project_statuses=ProjectStatus))
+
+ 
+@researcher.route('/re_upload', methods=["POST"])
+@login_required
+@restrict_user(current_user, "Researcher")
+def re_upload_documents():
+    # TODO re-upload
+    files = request.files.getlist('files')
+    project_id = request.form.get('project_id')
+    project = get_project(project_id)
+    file_str = str(files)
+    num_files = len(files)
+ 
+    if num_files == 0 or file_str.count("FileStorage: ''") == 1:
+            flash("Nessun file inserito", category="error")
+            print("PR: ", project)
+            return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
+    
+    docs = []
+    for file in files:
+        filename = file.filename
+        doc = Document.query.filter_by(file_name=filename, project_id=project_id).first()
+        if doc is not None:
+            docs.append(doc)
+        else:
+            flash('Uno o più file selezionati non sono validi, ripetere la procedura', category='error')
+            return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
+    i = 0
+    for file in files:
+        print("\nsas: ", file)
+        file_path = re_upload(docs[i])
+        file.save(file_path)
+        i += 1
+    
+    flash('Tutti i file selezionati sono stati ricaricati correttamente', category='success')
+
+    return redirect(url_for('researcher.researcher_home', project=project))

@@ -78,10 +78,13 @@
 
         <div class="py-12" />
 
-        <form action="/researcher/project"
+        <form action="/researcher/re_upload"
             class="w-full"
             method="POST"
             enctype="multipart/form-data">
+            <input type="hidden"
+                name="project_id"
+                value="{{project.id}}">
             {% if project.status == project_statuses.SUBMITTED_FOR_EVALUATION %}
             <!-- TODO change to project_statuses.REQUIRES_CHANGES -->
             {% with form_name_reference="files", submit_button_text="Richiedi nuova valutazione" %}

@@ -144,9 +144,8 @@ def download_zip_documents(project_id):
     # -> da mettere ogni volta in una route function si richiama la download zip
 
 # to test
-def re_upload(file):
+def re_upload(doc):
 
-    doc = Document.query.filter_by(file_name=str(file)).first()
     sub = str(doc.project_id)
     file_name = doc.file_name
 
@@ -163,13 +162,12 @@ def re_upload(file):
     # build entire file path
     file_path = os.path.join(subfolder_path, file_name)
 
-    if os.path.exists(file_path) and doc is not None:
+    if os.path.exists(file_path):
         # if file exists I need to reload it (delete the old one
         # and add the new one -> SAME file_name)
-        os.remove(file_path)
-        #file = request.files.getlist("files")
-        file.save(file_path)
         print("\n\nIl file esiste nella cartella. Sostituzione Avvenuta\n")
+        os.remove(file_path)
+        return file_path
     else:
         # è un problema se il file non esiste già perchè 
         # il file è da sostituire, quindi prima per forza deve esistere

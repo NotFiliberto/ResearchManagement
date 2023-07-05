@@ -161,17 +161,9 @@ def re_upload(doc):
     subfolder_path = os.path.join(folder_outside, sub)
     # build entire file path
     file_path = os.path.join(subfolder_path, file_name)
-
-    if os.path.exists(file_path):
-        # if file exists I need to reload it (delete the old one
-        # and add the new one -> SAME file_name)
-        print("\n\nIl file esiste nella cartella. Sostituzione Avvenuta\n")
-        os.remove(file_path)
-        return file_path
-    else:
-        # è un problema se il file non esiste già perchè 
-        # il file è da sostituire, quindi prima per forza deve esistere
-        flash('Il file da ricaricare non esiste', category='error')
-        return redirect(url_for('researcher.view_project'))
+    # remove file
+    os.remove(file_path)
+    # return file_path and use it to save the file in that path
+    return file_path
 
 

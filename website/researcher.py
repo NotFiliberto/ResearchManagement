@@ -131,7 +131,6 @@ def view_project():
 @login_required
 @restrict_user(current_user, "Researcher")
 def re_upload_documents():
-    # TODO re-upload
     files = request.files.getlist('files')
     project_id = request.form.get('project_id')
     project = get_project(project_id)
@@ -142,7 +141,8 @@ def re_upload_documents():
             flash("Nessun file inserito", category="error")
             print("PR: ", project)
             return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
-    
+    # check if selected files have a filename that matched
+    # with one or more documents of that particular project 
     docs = []
     for file in files:
         filename = file.filename
@@ -152,13 +152,14 @@ def re_upload_documents():
         else:
             flash('Uno o più file selezionati non sono validi, ripetere la procedura', category='error')
             return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
+    # here code means that all the files selected are suitable for reload
     i = 0
     for file in files:
         print("\nsas: ", file)
         file_path = re_upload(docs[i])
         file.save(file_path)
         i += 1
-    
+
     flash('Tutti i file selezionati sono stati ricaricati correttamente', category='success')
 
     return redirect(url_for('researcher.researcher_home', project=project))

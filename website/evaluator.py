@@ -41,7 +41,7 @@ def evaluate_project():
         #get data from html page
         status = request.form.get('project_status')
         project_id = request.form.get('project_id')
-        # get all project
+        # get project
         project = get_project(project_id)
         # set the new status given by evaluator
         change_project_state(status, project)

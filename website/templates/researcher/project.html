@@ -80,7 +80,8 @@
 
         <form action="/researcher/project"
             class="w-full"
-            method="POST">
+            method="POST"
+            enctype="multipart/form-data">
             {% if project.status == project_statuses.SUBMITTED_FOR_EVALUATION %}
             <!-- TODO change to project_statuses.REQUIRES_CHANGES -->
             {% with form_name_reference="files", submit_button_text="Richiedi nuova valutazione" %}

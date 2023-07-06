@@ -4,13 +4,10 @@ from website.models import Project, ProjectStatus, Report
 from .utils import get_project, restrict_user, change_project_state, create_report, get_reports
 from . import db
 
+
 evaluator = Blueprint('evaluator', __name__)
 
-# TODO route per i projects con def metodi crud:
-#  create(idProgetto, ricercatore), read(ricercatore, valutatore), update, delete  (crud operations)
 
-
-# home
 @evaluator.route('/',  methods=['GET', 'POST'])
 @login_required
 @restrict_user(current_user, "Evaluator")
@@ -24,18 +21,11 @@ def evaluator_home():
 @login_required
 @restrict_user(current_user, "Evaluator")
 def evaluate_project():
-
     if request.method == "GET":
+        # gets project_id from request and then the project special obj
         project_id = request.args.get('project_id')
         project = get_project(project_id)
-
-        reports = Report.query.all()
-        print("\nREPS: ", reports, "\n")
-        for rep in reports:
-            print("rep(id, evID, docID, descr): ", rep.report_id, rep.evaluator_id, rep.document_id, rep.description)        
-
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)
-
     if request.method == "POST":
         flash("ok valutato", category="success")
         #get data from html page
@@ -50,11 +40,10 @@ def evaluate_project():
         for d in project.documents:
             # gets the n-ary text area
             description = request.form['document_' + str(d.id)]
-            print("\nDESCRISCPTION: ", description, "\n")
+            # there's only one report for each document (maximum)
             create_report(d.id, current_user.id, description)
             i += 1
-
+        # gets all the projects in descendant order (most recent) 
         projects = Project.query.order_by(Project.project_id.desc()).all()
-
         return render_template('evaluator/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 

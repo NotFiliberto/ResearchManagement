@@ -41,7 +41,6 @@ def get_project(project_id):
                 researcher=res,
                 documents=documents
                 )
-
     return project
 
 # tested, usage: restrict access to pages with this route decorator
@@ -123,7 +122,6 @@ def download_zip_documents(project_id):
         print("\ndocument: ", d, "\n")
         # download_document returns the path of the file so you can download it
         file_paths.append(download_document(d.id))
-
        # Create .zip temporary file in memory
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w') as zipf:
@@ -132,22 +130,15 @@ def download_zip_documents(project_id):
             file_name = os.path.basename(file_path)
             # Add to .zip file with no other sub-directories
             zipf.write(file_path, arcname=file_name)
-
     # Sets the current position of the Buffer to the beginning
     zip_buffer.seek(0)
-    
     # Use this zip_buffer to send it as a return (whenever dowload zip is needed)
     return zip_buffer
-    # 
-    # return send_file(zip_buffer, as_attachment=True, attachment_filename=name)
-    # -> da mettere ogni volta in una route function si richiama la download zip
 
-# to test
+# tested
 def re_upload(doc):
-
     sub = str(doc.project_id)
     file_name = doc.file_name
-
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
     # Absolute path outside current path(website) -> current path - 1 

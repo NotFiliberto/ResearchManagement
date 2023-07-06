@@ -5,9 +5,9 @@ from . import db
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask import Flask
 from flask_login import login_required, current_user
-from .models import Project, ProjectStatus, Document, Report
+from .models import Project, ProjectStatus, Document
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_project, create_report, re_upload
+from .utils import restrict_user, get_project, re_upload
 
 
 researcher = Blueprint('researcher', __name__)

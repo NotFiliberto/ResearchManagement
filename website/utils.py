@@ -1,8 +1,8 @@
 import io
 import os
 import zipfile
-from .models import Project, Researcher, Document, ProjectStatus, Evaluation_Interval, Report
-from flask import redirect, url_for, request, flash
+from .models import Project, Researcher, Document, ProjectStatus, Report
+from flask import redirect, url_for
 from functools import wraps
 from collections import namedtuple
 from . import db

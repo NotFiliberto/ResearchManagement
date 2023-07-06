@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required, current_user
 from website.models import Project, ProjectStatus
 from .utils import get_project, restrict_user, change_project_state, create_report
@@ -13,7 +13,8 @@ evaluator = Blueprint('evaluator', __name__)
 @restrict_user(current_user, "Evaluator")
 def evaluator_home():
     # get projects
-    projects = Project.query.filter_by(status=ProjectStatus.SUBMITTED_FOR_EVALUATION).order_by(Project.project_id.desc()).all()
+    projects = Project.query.filter_by(
+        status=ProjectStatus.SUBMITTED_FOR_EVALUATION).order_by(Project.project_id.desc()).all()
     return render_template('evaluator/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 
@@ -27,12 +28,12 @@ def evaluate_project():
         project = get_project(project_id)
         return render_template('evaluator/evaluate_project.html', user=current_user, project=project, project_statuses=ProjectStatus)
     if request.method == "POST":
-        flash("ok valutato", category="success")
-        #get data from html page
+        # get data from html page
         status = request.form.get('project_status')
         project_id = request.form.get('project_id')
         # get project
         project = get_project(project_id)
+        flash(f"{project.name} valutato! [{status}]", category="success")
         # set the new status given by evaluator
         change_project_state(status, project)
         # for each document, create a report
@@ -43,7 +44,4 @@ def evaluate_project():
             # there's only one report for each document (maximum)
             create_report(d.id, current_user.id, description)
             i += 1
-        # gets all the projects in descendant order (most recent) 
-        projects = Project.query.order_by(Project.project_id.desc()).all()
-        return render_template('evaluator/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
-
+        return redirect(url_for('evaluator.evaluator_home', user=current_user))

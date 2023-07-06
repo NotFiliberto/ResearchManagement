@@ -1,7 +1,7 @@
 import io
 import os
 import zipfile
-from .models import Project, Researcher, Document, ProjectStatus, Evaluation_Interval, Report
+from .models import Project, Researcher, Document, ProjectStatus, Report
 from flask import redirect, url_for
 from functools import wraps
 from collections import namedtuple
@@ -28,7 +28,7 @@ def get_project(project_id):
         project_rep = Report.query.filter_by(document_id=d.document_id).first()
         if project_rep is not None:  
             rep = REP(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id, 
-                document_id=project_id.document_id, description=project_rep.description)
+                document_id=project_rep.document_id, description=project_rep.description)
         else: 
             rep = None
         dd = D(id=d.document_id, name=d.file_name, report=rep)
@@ -41,7 +41,6 @@ def get_project(project_id):
                 researcher=res,
                 documents=documents
                 )
-
     return project
 
 # tested, usage: restrict access to pages with this route decorator
@@ -64,12 +63,21 @@ def change_project_state(status, project):
 
 # tested
 def create_report(document_id, evaluator_id, description):
-    report = Report(document_id=document_id, 
-                    evaluator_id=evaluator_id, 
-                    description=description)
-    db.session.add(report)
-    db.session.commit()
-    return report
+    doc = Document.query.filter_by(document_id=document_id).first()
+    checkExisting = Report.query.filter_by(document_id=document_id).first()
+    if checkExisting is None and doc is not None :
+        # if document has not already a report, create it
+        report = Report(document_id=document_id, 
+                        evaluator_id=evaluator_id, 
+                        description=description)
+        db.session.add(report)
+        db.session.commit()
+        return report
+    elif checkExisting is not None and doc is not None:
+        # otherwise, only update the description
+        checkExisting.description = description
+        db.session.commit()
+    return None
 
 # tested
 def get_reports(project_id):
@@ -86,7 +94,6 @@ def get_reports(project_id):
 def download_document(document_id):
     d = Document.query.filter_by(document_id=document_id).first()
     file_name = d.file_name
-    file_name = file_name.replace(" ", "_")
     sub = str(d.project_id)
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -115,7 +122,6 @@ def download_zip_documents(project_id):
         print("\ndocument: ", d, "\n")
         # download_document returns the path of the file so you can download it
         file_paths.append(download_document(d.id))
-
        # Create .zip temporary file in memory
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w') as zipf:
@@ -124,13 +130,29 @@ def download_zip_documents(project_id):
             file_name = os.path.basename(file_path)
             # Add to .zip file with no other sub-directories
             zipf.write(file_path, arcname=file_name)
-
     # Sets the current position of the Buffer to the beginning
     zip_buffer.seek(0)
-    
     # Use this zip_buffer to send it as a return (whenever dowload zip is needed)
     return zip_buffer
-    # 
-    # return send_file(zip_buffer, as_attachment=True, attachment_filename=name)
-    # -> da mettere ogni volta in una route function si richiama la download zip
-    
+
+# tested
+def re_upload(doc):
+    sub = str(doc.project_id)
+    file_name = doc.file_name
+    # current path (.py file is stored in website folder)
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    # Absolute path outside current path(website) -> current path - 1 
+    outside_website = os.path.dirname(current_path)
+    # Folder name of which contains all the projects
+    file_folder_name = 'project_files'
+    # path to the folder 
+    folder_outside = os.path.join(outside_website, file_folder_name) 
+    # path to the subfolder
+    subfolder_path = os.path.join(folder_outside, sub)
+    # build entire file path
+    file_path = os.path.join(subfolder_path, file_name)
+    # remove file
+    os.remove(file_path)
+    # return file_path and use it to save the file in that path
+    return file_path
+

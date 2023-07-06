@@ -22,7 +22,7 @@
             <h1 class="inline font-bold text-3xl">
                 {{project.name}}
             </h1>
-            <div class="inline-block px-3">
+            <div class="inline-block px-3 text-center">
                 {% with status=project.status %}
                 {% include 'project_status_badge.html' %}
                 {% endwith %}

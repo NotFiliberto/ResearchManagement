@@ -85,8 +85,7 @@
             <input type="hidden"
                 name="project_id"
                 value="{{project.id}}">
-            {% if project.status == project_statuses.SUBMITTED_FOR_EVALUATION %}
-            <!-- TODO change to project_statuses.REQUIRES_CHANGES -->
+            {% if project.status == project_statuses.REQUIRES_CHANGES %}
             {% with form_name_reference="files", submit_button_text="Richiedi nuova valutazione" %}
             {% include 'file_uploader.html' %}
             {% endwith %}

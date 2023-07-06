@@ -18,7 +18,8 @@ researcher = Blueprint('researcher', __name__)
 @login_required
 @restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
 def researcher_home():
-    projects = Project.query.filter_by(researcher_id = current_user.id).order_by(Project.project_id.desc())
+    projects = Project.query.filter_by(
+        researcher_id=current_user.id).order_by(Project.project_id.desc())
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 
@@ -74,7 +75,7 @@ def create_project():
             path_to_file = os.path.join(path_save_into, filename)
             if os.path.exists(path_to_file):
                 flash('Il file: ' + str(filename) +
-                        ', esiste già nel progetto', category='error')
+                      ', esiste già nel progetto', category='error')
                 continue
             # Create a document only if file does not already exists, then ADD into DB
             document = Document(
@@ -91,23 +92,19 @@ def create_project():
     return render_template('researcher/create.html', user=current_user)
 
 
-@researcher.route('/project', methods=['GET', 'POST'])
+@researcher.route('/project', methods=['GET'])
 @login_required
 @restrict_user(current_user, "Researcher")
 def view_project():
-    if request.method == "GET":
-        project_id = request.args.get('project_id')
-        project = Project.query.filter_by(project_id=project_id).first()
-        print("\n\n PR ID and PR: ", project_id, " + ", project)
-        if project is not None:
-            project = get_project(project_id)
-        else:
-            flash('Non esistono progetti corrispondenti nel DB', category='error')
-        return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
-    if request.method == "POST":
-        return redirect(url_for('researcher.re_upload_documents', user=current_user, project=project, project_statuses=ProjectStatus))
+    project_id = request.args.get('project_id')
+    project = get_project(project_id)
 
- 
+    if project is None:
+        flash('Non esistono progetti corrispondenti nel DB', category='error')
+    else:
+        return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
+
+
 @researcher.route('/re_upload', methods=["POST"])
 @login_required
 @restrict_user(current_user, "Researcher")
@@ -120,19 +117,21 @@ def re_upload_documents():
     num_files = len(files)
     # check if any file was selected
     if num_files == 0 or file_str.count("FileStorage: ''") == 1:
-            flash("Nessun file inserito", category="error")
-            print("PR: ", project)
-            return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
+        flash("Nessun file inserito", category="error")
+        print("PR: ", project)
+        return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
     # check if selected files have a filename that matched
-    # with one or more documents of that particular project 
+    # with one or more documents of that particular project
     docs = []
     for file in files:
         filename = file.filename
-        doc = Document.query.filter_by(file_name=filename, project_id=project_id).first()
+        doc = Document.query.filter_by(
+            file_name=filename, project_id=project_id).first()
         if doc is not None:
             docs.append(doc)
         else:
-            flash('Uno o più file selezionati non sono validi, ripetere la procedura', category='error')
+            flash(
+                'Uno o più file selezionati non sono validi, ripetere la procedura', category='error')
             return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
     # here code means that all the files selected are suitable for reload
     i = 0
@@ -141,5 +140,6 @@ def re_upload_documents():
         file_path = re_upload(docs[i])
         file.save(file_path)
         i += 1
-    flash('Tutti i file selezionati sono stati ricaricati correttamente', category='success')
-    return redirect(url_for('researcher.researcher_home', project=project))
+    flash('Tutti i file selezionati sono stati ricaricati correttamente',
+          category='success')
+    return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)

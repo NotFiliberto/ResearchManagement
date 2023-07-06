@@ -12,6 +12,10 @@ from . import db
 def get_project(project_id):
     # getting info from queries
     p = Project.query.filter_by(project_id=project_id).first()
+
+    if (p is None):
+        return None
+
     r = Researcher.query.filter_by(id=p.researcher_id).first()
     docs = Document.query.filter_by(project_id=project_id)
     # creating new models for project obj
@@ -19,17 +23,18 @@ def get_project(project_id):
                    'status', 'researcher', 'documents'])
     Res = namedtuple('R', ['id', 'name', 'username'])
     D = namedtuple('D', ['id', 'name', 'report'])
-    REP = namedtuple('REP', ['id', 'evaluator_id', 'document_id', 'description'])
+    REP = namedtuple('REP', ['id', 'evaluator_id',
+                     'document_id', 'description'])
     # create a researcher object to assign to its project obj
     res = Res(id=r.id, name=r.email, username=r.username)
     # create a document list to assign to its project obj
     documents = []
     for d in docs:
         project_rep = Report.query.filter_by(document_id=d.document_id).first()
-        if project_rep is not None:  
-            rep = REP(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id, 
-                document_id=project_rep.document_id, description=project_rep.description)
-        else: 
+        if project_rep is not None:
+            rep = REP(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id,
+                      document_id=project_rep.document_id, description=project_rep.description)
+        else:
             rep = None
         dd = D(id=d.document_id, name=d.file_name, report=rep)
         documents.append(dd)
@@ -37,13 +42,15 @@ def get_project(project_id):
     project = P(id=p.project_id,
                 name=p.name,
                 description=p.description,
-                status=ProjectStatus.SUBMITTED_FOR_EVALUATION,
+                status=p.status,
                 researcher=res,
                 documents=documents
                 )
     return project
 
 # tested, usage: restrict access to pages with this route decorator
+
+
 def restrict_user(current_user, user_type):
     def decorator(route_function):
         @wraps(route_function)
@@ -55,6 +62,8 @@ def restrict_user(current_user, user_type):
     return decorator
 
 # tested
+
+
 def change_project_state(status, project):
     if status != project.status:
         p = Project.query.filter_by(project_id=project.id).first()
@@ -62,13 +71,15 @@ def change_project_state(status, project):
         db.session.commit()
 
 # tested
+
+
 def create_report(document_id, evaluator_id, description):
     doc = Document.query.filter_by(document_id=document_id).first()
     checkExisting = Report.query.filter_by(document_id=document_id).first()
-    if checkExisting is None and doc is not None :
+    if checkExisting is None and doc is not None:
         # if document has not already a report, create it
-        report = Report(document_id=document_id, 
-                        evaluator_id=evaluator_id, 
+        report = Report(document_id=document_id,
+                        evaluator_id=evaluator_id,
                         description=description)
         db.session.add(report)
         db.session.commit()
@@ -80,6 +91,8 @@ def create_report(document_id, evaluator_id, description):
     return None
 
 # tested
+
+
 def get_reports(project_id):
     p = get_project(project_id)
     reports = []
@@ -89,25 +102,27 @@ def get_reports(project_id):
 
     return reports
 
-# tested, usage: to get the path of the file so 
+# tested, usage: to get the path of the file so
 # you can send_file(path) to the page where it is needed
+
+
 def download_document(document_id):
     d = Document.query.filter_by(document_id=document_id).first()
     file_name = d.file_name
     sub = str(d.project_id)
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
-    # Absolute path outside current path(website) -> current path - 1 
+    # Absolute path outside current path(website) -> current path - 1
     outside_website = os.path.dirname(current_path)
     # Folder name of which contains all the projects
     file_folder_name = 'project_files'
-    # path to the folder 
-    folder_outside = os.path.join(outside_website, file_folder_name) 
+    # path to the folder
+    folder_outside = os.path.join(outside_website, file_folder_name)
     # path to the subfolder
     subfolder_path = os.path.join(folder_outside, sub)
     # path to file
     file_path = os.path.join(subfolder_path, file_name)
-    # return the file path and ONY then you can send the file as a return 
+    # return the file path and ONY then you can send the file as a return
     return file_path
 
 # tested, maybe other tests needed
@@ -115,6 +130,8 @@ def download_document(document_id):
 #  zip_buffer = download_zip_documents(project_id)
 #  name = 'project_{}_files.zip'.format(project_id)
 #  return send_file(zip_buffer, as_attachment=True, download_name=name)
+
+
 def download_zip_documents(project_id):
     p = get_project(project_id)
     file_paths = []
@@ -136,17 +153,19 @@ def download_zip_documents(project_id):
     return zip_buffer
 
 # tested
+
+
 def re_upload(doc):
     sub = str(doc.project_id)
     file_name = doc.file_name
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
-    # Absolute path outside current path(website) -> current path - 1 
+    # Absolute path outside current path(website) -> current path - 1
     outside_website = os.path.dirname(current_path)
     # Folder name of which contains all the projects
     file_folder_name = 'project_files'
-    # path to the folder 
-    folder_outside = os.path.join(outside_website, file_folder_name) 
+    # path to the folder
+    folder_outside = os.path.join(outside_website, file_folder_name)
     # path to the subfolder
     subfolder_path = os.path.join(folder_outside, sub)
     # build entire file path
@@ -155,4 +174,3 @@ def re_upload(doc):
     os.remove(file_path)
     # return file_path and use it to save the file in that path
     return file_path
-

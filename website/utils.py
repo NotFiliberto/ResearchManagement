@@ -30,13 +30,13 @@ def get_project(project_id):
     # create a document list to assign to its project obj
     documents = []
     for d in docs:
-        project_rep = Report.query.filter_by(document_id=d.document_id).first()
+        project_rep = Report.query.filter_by(document_id=d.id).first()
         if project_rep is not None:
             rep = REP(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id,
                       document_id=project_rep.document_id, description=project_rep.description)
         else:
             rep = None
-        dd = D(id=d.document_id, name=d.file_name, report=rep)
+        dd = D(id=d.id, name=d.file_name, report=rep)
         documents.append(dd)
     # Assign each project attribute, researcher and documents included
     project = P(id=p.project_id,
@@ -70,7 +70,7 @@ def change_project_state(status, project):
 
 # tested
 def create_report(document_id, evaluator_id, description):
-    doc = Document.query.filter_by(document_id=document_id).first()
+    doc = Document.query.filter_by(id=document_id).first()
     checkExisting = Report.query.filter_by(document_id=document_id).first()
     if checkExisting is None and doc is not None:
         # if document has not already a report, create it
@@ -99,7 +99,7 @@ def get_reports(project_id):
 # tested -> usage: to get the path of the file so
 # you can send_file(path) to the page where it is needed
 def download_document(document_id):
-    d = Document.query.filter_by(document_id=document_id).first()
+    d = Document.query.filter_by(id=document_id).first()
     file_name = d.file_name
     sub = str(d.project_id)
     # current path (.py file is stored in website folder)

@@ -26,16 +26,16 @@ def sign_in():
         if user:
             # check password
             if check_password_hash(user.password, password):
-                flash('Signed in successfully', category='success')
+                flash('Accesso avvenuto con succeso', category='success')
                 login_user(user, remember=True)
 
                 return redirect(url_for('views.home'))
 
             else:
-                flash('Wrong email or password!',
+                flash('Email o password errata!',
                       category='error')
         else:
-            flash('Wrong email or password!',
+            flash('Email o password errata!',
                   category='error')
 
     return render_template('auth/signin.html')
@@ -64,9 +64,9 @@ def sign_up():
         user = User.query.filter_by(email=email).first()
 
         if user:
-            flash('Email already exists', category='error')
+            flash('Esiste già un account con questa email', category='error')
         elif (len(username) <= 2):
-            flash('Username must be grater than 2 characters',
+            flash('Lo username come minimo deve avere 3 caratteri',
                   category='error')
         else:
             # TODO registration logic (db)
@@ -87,7 +87,7 @@ def sign_up():
                     db.session.add(new_user)
                     db.session.commit()  # notify the db that we've made some changes so update it
 
-                    flash('Account created', category='success')
+                    flash('Account creato con successo', category='success')
 
                     # signin user
                     login_user(remember=True, user=new_user)

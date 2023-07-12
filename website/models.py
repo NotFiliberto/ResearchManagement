@@ -69,7 +69,7 @@ class Project(db.Model):
 
 
 class Document(db.Model):
-    document_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     file_extension = db.Column(db.String(10))
     file_name = db.Column(db.String(150))
     project_id = db.Column(db.Integer, db.ForeignKey(
@@ -81,5 +81,5 @@ class Report(db.Model):
     evaluator_id = db.Column(
         db.Integer, db.ForeignKey('evaluator.id'))
     document_id = db.Column(
-        db.Integer, db.ForeignKey('document.document_id'))
+        db.Integer, db.ForeignKey('document.id'))
     description = db.Column(db.Text())

@@ -50,7 +50,6 @@ def signout():
 
 @auth.route('/signup', methods=["GET", "POST"])
 def sign_up():
-
     if request.method == "POST":
         data = request.form
         print(data)
@@ -59,6 +58,7 @@ def sign_up():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
+        user_type = request.form.get('user_type')
 
         # check if user already exists
         user = User.query.filter_by(email=email).first()
@@ -70,19 +70,32 @@ def sign_up():
                   category='error')
         else:
             # TODO registration logic (db)
-            new_user = User(email=email, username=username,
-                            password=generate_password_hash(password, method='scrypt'))
-            db.session.add(new_user)
-            db.session.commit()  # notify the db that we've made some changes so update it
+            try:
+                if (user_type.upper() == "EVALUATOR"):
+                    new_user = Evaluator(username=username, email=email, password=generate_password_hash(
+                        password, method='scrypt'))
+                elif user_type.upper() == "RESEARCHER":
+                    new_user = Researcher(username=username, email=email, password=generate_password_hash(
+                        password, method='scrypt'))
+                else:
+                    new_user = None
 
-            flash('Account created', category='success')
+                if new_user is None:
+                    flash("Errore durante la creazione dell'utente!",
+                          category="error")
+                else:
+                    db.session.add(new_user)
+                    db.session.commit()  # notify the db that we've made some changes so update it
 
-            # signin user
-            login_user(remember=True, user=new_user)
+                    flash('Account created', category='success')
 
-            # inherit the url from view (BLUPRINT_NAME.FUNCTION_NAME u want go to)
-            return redirect(url_for('views.home'))
+                    # signin user
+                    login_user(remember=True, user=new_user)
 
-        # return "registra utente"
+                    # inherit the url from view (BLUPRINT_NAME.FUNCTION_NAME u want go to)
+                    return redirect(url_for('views.home'))
+            except:
+                flash('Errore durante la registrazione, riprova!',
+                      category='error')
 
-    return render_template('auth/signup.html', text="")
+    return render_template('auth/signup.html')

@@ -1,6 +1,8 @@
 import io
 import os
 import zipfile
+
+from website.config import PROJECT_FILES_FOLDER
 from .models import Project, Researcher, Document, ProjectStatus, Report
 from flask import redirect, url_for
 from functools import wraps
@@ -124,10 +126,8 @@ def download_document(document_id):
     current_path = os.path.dirname(os.path.abspath(__file__))
     # Absolute path outside current path(website) -> current path - 1
     outside_website = os.path.dirname(current_path)
-    # Folder name of which contains all the projects
-    file_folder_name = 'project_files'
     # path to the folder
-    folder_outside = os.path.join(outside_website, file_folder_name)
+    folder_outside = os.path.join(outside_website, PROJECT_FILES_FOLDER)
     # path to the subfolder
     subfolder_path = os.path.join(folder_outside, sub)
     # path to file
@@ -172,10 +172,8 @@ def re_upload(doc):
     current_path = os.path.dirname(os.path.abspath(__file__))
     # Absolute path outside current path(website) -> current path - 1
     outside_website = os.path.dirname(current_path)
-    # Folder name of which contains all the projects
-    file_folder_name = 'project_files'
     # path to the folder
-    folder_outside = os.path.join(outside_website, file_folder_name)
+    folder_outside = os.path.join(outside_website, PROJECT_FILES_FOLDER)
     # path to the subfolder
     subfolder_path = os.path.join(folder_outside, sub)
     # build entire file path

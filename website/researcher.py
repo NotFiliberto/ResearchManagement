@@ -7,7 +7,7 @@ from flask import Flask
 from flask_login import login_required, current_user
 from .models import Project, ProjectStatus, Document
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_project, re_upload, change_project_state
+from .utils import restrict_user, get_project, re_upload, change_project_state, standardize_accents
 
 
 researcher = Blueprint('researcher', __name__)
@@ -65,6 +65,7 @@ def create_project():
         for file in files:
             # get filename
             filename = secure_filename(file.filename)
+            filename = standardize_accents(filename)
             folder_save_into = 'project_files'
             sub_folder = str(project.project_id)
             # sub_folder = str(1) # for TEST change to id = 1, avoiding new dir(None)
@@ -79,7 +80,7 @@ def create_project():
                 continue
             # Create a document only if file does not already exists, then ADD into DB
             document = Document(
-                file_extension=extension, file_name=file.filename, project_id=project.project_id)
+                file_extension=extension, file_name=filename, project_id=project.project_id)
             db.session.add(document)
             db.session.commit()
             # save file in the right folder

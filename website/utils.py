@@ -49,6 +49,8 @@ def get_project(project_id):
     return project
 
 # tested, usage: restrict access to pages with this route decorator
+
+
 def restrict_user(current_user, user_type):
     def decorator(route_function):
         @wraps(route_function)
@@ -60,6 +62,8 @@ def restrict_user(current_user, user_type):
     return decorator
 
 # tested
+
+
 def change_project_state(status, project):
     if status != project.status:
         p = Project.query.filter_by(project_id=project.id).first()
@@ -69,22 +73,34 @@ def change_project_state(status, project):
         return project
 
 # tested
+
+
 def create_report(document_id, evaluator_id, description):
-    doc = Document.query.filter_by(id=document_id).first()
-    checkExisting = Report.query.filter_by(document_id=document_id).first()
-    if checkExisting is None and doc is not None:
-        # if document has not already a report, create it
+    document = Document.query.filter_by(id=document_id).first()
+
+    if (document is None):  # document not exists
+        return None
+
+    # find existing report
+    report = Report.query.filter_by(
+        document_id=document_id).first()
+
+    # check if already exist
+    if report is None:
+        # add
         report = Report(document_id=document_id,
                         evaluator_id=evaluator_id,
                         description=description)
         db.session.add(report)
         db.session.commit()
-        return report
-    elif checkExisting is not None and doc is not None:
-        # otherwise, only update the description
-        checkExisting.description = description
+    else:
+        # update
+        report.description = description
+
         db.session.commit()
-    return None
+
+    return report
+
 
 # tested
 def get_reports(project_id):
@@ -98,6 +114,8 @@ def get_reports(project_id):
 
 # tested -> usage: to get the path of the file so
 # you can send_file(path) to the page where it is needed
+
+
 def download_document(document_id):
     d = Document.query.filter_by(id=document_id).first()
     file_name = d.file_name
@@ -122,6 +140,8 @@ def download_document(document_id):
 #  zip_buffer = download_zip_documents(project_id)
 #  name = 'project_{}_files.zip'.format(project_id)
 #  return send_file(zip_buffer, as_attachment=True, download_name=name)
+
+
 def download_zip_documents(project_id):
     p = get_project(project_id)
     file_paths = []
@@ -143,6 +163,8 @@ def download_zip_documents(project_id):
     return zip_buffer
 
 # tested
+
+
 def re_upload(doc):
     sub = str(doc.project_id)
     file_name = doc.file_name
@@ -162,4 +184,3 @@ def re_upload(doc):
     os.remove(file_path)
     # return file_path and use it to save the file in that path
     return file_path
-

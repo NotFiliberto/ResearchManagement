@@ -57,7 +57,7 @@ def get_project(project_id):
 # tested, usage: restrict access to pages with this route decorator
 
 
-def restrict_user(current_user, user_type):
+def restrict_user(current_user, authorized_types):
     def decorator(route_function):
         @wraps(route_function)
         def decorated_function(*args, **kwargs):

@@ -67,6 +67,7 @@ def create_project():
         for file in files:
             # get filename
             filename = secure_filename(file.filename)
+            filename = standardize_accents(filename)
             sub_folder = str(project.project_id)
             # sub_folder = str(1) # for TEST change to id = 1, avoiding new dir(None)
             path_save_into = os.path.join(PROJECT_FILES_FOLDER, sub_folder)

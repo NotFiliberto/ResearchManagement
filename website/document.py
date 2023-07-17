@@ -21,7 +21,6 @@ def download():
 @restrict_user(current_user, ['Researcher', 'Evaluator'])
 def downloadzip():
     project_id = request.args.get('project_id')
-    # project_id = 1
     project = Project.query.filter_by(project_id=project_id).first()
     if project_id is None or project is None:
         return redirect(url_for('static', filename='404.html'))

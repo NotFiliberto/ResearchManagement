@@ -128,7 +128,6 @@ def get_reports(project_id):
 
 def download_document(document_id):
     d = Document.query.filter_by(id=document_id).first()
-    print("\nFILE: ",d, " ", d.file_name, "\n")
     file_name = standardize_accents(d.file_name)
     sub = str(d.project_id)
     # current path (.py file is stored in website folder)
@@ -155,7 +154,6 @@ def download_zip_documents(project_id):
     p = get_project(project_id)
     file_paths = []
     for d in p.documents:
-        print("\ndocument: ", d, "\n")
         # download_document returns the path of the file so you can download it
         file_paths.append(download_document(d.id))
        # Create .zip temporary file in memory

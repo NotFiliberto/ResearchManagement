@@ -52,7 +52,6 @@ def signout():
 def sign_up():
     if request.method == "POST":
         data = request.form
-        print(data)
 
         # TODO validation logic
         username = request.form.get('username')

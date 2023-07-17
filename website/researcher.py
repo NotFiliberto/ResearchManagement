@@ -1,6 +1,8 @@
 import os
 
 from sqlalchemy import or_
+
+from website.config import PROJECT_FILES_FOLDER
 from . import db
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask import Flask
@@ -65,11 +67,9 @@ def create_project():
         for file in files:
             # get filename
             filename = secure_filename(file.filename)
-            filename = standardize_accents(filename)
-            folder_save_into = 'project_files'
             sub_folder = str(project.project_id)
             # sub_folder = str(1) # for TEST change to id = 1, avoiding new dir(None)
-            path_save_into = os.path.join(folder_save_into, sub_folder)
+            path_save_into = os.path.join(PROJECT_FILES_FOLDER, sub_folder)
             if not os.path.exists(path_save_into):
                 os.makedirs(path_save_into)
             # create path to the file
@@ -97,7 +97,7 @@ def create_project():
 @login_required
 @restrict_user(current_user, ['Researcher'])
 def view_project():
-    
+
     project_id = request.args.get('project_id')
     project = get_project(project_id)
 
@@ -132,7 +132,8 @@ def re_upload_documents():
         if doc is not None:
             docs.append(doc)
         else:
-            flash('Uno o più file selezionati non sono validi, ripetere la procedura', category='error')
+            flash(
+                'Uno o più file selezionati non sono validi, ripetere la procedura', category='error')
             return redirect(url_for('researcher.view_project', project_id=project_id))
             # here code means that all the files selected are suitable for reload
     i = 0
@@ -141,6 +142,7 @@ def re_upload_documents():
         file.save(file_path)
         i += 1
     flash('Tutti i file selezionati sono stati ricaricati correttamente',
-        category='success')
-    project = change_project_state(ProjectStatus.SUBMITTED_FOR_EVALUATION, project)
+          category='success')
+    project = change_project_state(
+        ProjectStatus.SUBMITTED_FOR_EVALUATION, project)
     return redirect(url_for('researcher.view_project', project_id=project_id))

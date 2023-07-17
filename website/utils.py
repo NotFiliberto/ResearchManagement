@@ -53,11 +53,15 @@ def get_project(project_id):
     return project
 
 # tested, usage: restrict access to pages with this route decorator
-def restrict_user(current_user, user_type):
+def restrict_user(current_user, authorized_types):
     def decorator(route_function):
         @wraps(route_function)
         def decorated_function(*args, **kwargs):
-            if not current_user or not current_user.__class__.__name__ == str(user_type):
+            authorized = False
+            for user_type in authorized_types:
+                if current_user.__class__.__name__ == str(user_type):
+                    authorized = True
+            if authorized == False or current_user is None:
                 return redirect(url_for('static', filename='401.html'))
             return route_function(*args, **kwargs)
         return decorated_function

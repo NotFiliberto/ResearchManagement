@@ -10,7 +10,7 @@ evaluator = Blueprint('evaluator', __name__)
 
 @evaluator.route('/',  methods=['GET', 'POST'])
 @login_required
-@restrict_user(current_user, "Evaluator")
+@restrict_user(current_user, ['Evaluator'])
 def evaluator_home():
     # get projects
     projects = Project.query.filter_by(
@@ -20,7 +20,7 @@ def evaluator_home():
 
 @evaluator.route('/evaluate_project', methods=['GET', 'POST'])
 @login_required
-@restrict_user(current_user, "Evaluator")
+@restrict_user(current_user, ['Evaluator'])
 def evaluate_project():
     if request.method == "GET":
         # gets project_id from request and then the project special obj

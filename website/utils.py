@@ -8,6 +8,10 @@ from flask import redirect, url_for
 from functools import wraps
 from collections import namedtuple
 from . import db
+import unicodedata
+
+def standardize_accents(string):
+    return ''.join(c for c in unicodedata.normalize('NFD', string) if not unicodedata.combining(c))
 
 
 # tested, added documents[i].report
@@ -53,11 +57,15 @@ def get_project(project_id):
 # tested, usage: restrict access to pages with this route decorator
 
 
-def restrict_user(current_user, user_type):
+def restrict_user(current_user, authorized_types):
     def decorator(route_function):
         @wraps(route_function)
         def decorated_function(*args, **kwargs):
-            if not current_user or not current_user.__class__.__name__ == str(user_type):
+            authorized = False
+            for user_type in authorized_types:
+                if current_user.__class__.__name__ == str(user_type):
+                    authorized = True
+            if authorized == False or current_user is None:
                 return redirect(url_for('static', filename='401.html'))
             return route_function(*args, **kwargs)
         return decorated_function
@@ -120,7 +128,8 @@ def get_reports(project_id):
 
 def download_document(document_id):
     d = Document.query.filter_by(id=document_id).first()
-    file_name = d.file_name
+    print("\nFILE: ",d, " ", d.file_name, "\n")
+    file_name = standardize_accents(d.file_name)
     sub = str(d.project_id)
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -167,7 +176,7 @@ def download_zip_documents(project_id):
 
 def re_upload(doc):
     sub = str(doc.project_id)
-    file_name = doc.file_name
+    file_name = standardize_accents(doc.file_name)
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
     # Absolute path outside current path(website) -> current path - 1

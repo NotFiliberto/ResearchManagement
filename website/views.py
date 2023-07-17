@@ -13,3 +13,5 @@ def home():
         return redirect(url_for('researcher.researcher_home'))
     elif current_user.__class__.__name__ == "Evaluator":
         return redirect(url_for('evaluator.evaluator_home'))
+    message = "welcome to our page dear user, " + str(current_user.username) + ", seems like you have no roles but you can ask and wait to be added with a role"
+    return message

@@ -9,7 +9,7 @@ from flask import Flask
 from flask_login import login_required, current_user
 from .models import Project, ProjectStatus, Document
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_project, re_upload, change_project_state
+from .utils import restrict_user, get_project, re_upload, change_project_state, standardize_accents
 
 
 researcher = Blueprint('researcher', __name__)
@@ -18,7 +18,7 @@ researcher = Blueprint('researcher', __name__)
 # home
 @researcher.route('/',  methods=['GET', 'POST'])
 @login_required
-@restrict_user(current_user, "Researcher")  # TODO: FIX SIGN IN
+@restrict_user(current_user, ['Researcher'])  # TODO: FIX SIGN IN
 def researcher_home():
     projects = Project.query.filter_by(
         researcher_id=current_user.id).order_by(Project.project_id.desc())
@@ -27,7 +27,7 @@ def researcher_home():
 
 @researcher.route('/create', methods=['GET', 'POST'])
 @login_required
-@restrict_user(current_user, "Researcher")
+@restrict_user(current_user, ['Researcher'])
 def create_project():
     if request.method == "GET":
         return render_template('researcher/create.html', user=current_user)
@@ -67,7 +67,7 @@ def create_project():
         for file in files:
             # get filename
             filename = secure_filename(file.filename)
-
+            filename = standardize_accents(filename)
             sub_folder = str(project.project_id)
             # sub_folder = str(1) # for TEST change to id = 1, avoiding new dir(None)
             path_save_into = os.path.join(PROJECT_FILES_FOLDER, sub_folder)
@@ -81,7 +81,7 @@ def create_project():
                 continue
             # Create a document only if file does not already exists, then ADD into DB
             document = Document(
-                file_extension=extension, file_name=file.filename, project_id=project.project_id)
+                file_extension=extension, file_name=filename, project_id=project.project_id)
             db.session.add(document)
             db.session.commit()
             # save file in the right folder
@@ -96,7 +96,7 @@ def create_project():
 
 @researcher.route('/project/', methods=['GET'])
 @login_required
-@restrict_user(current_user, "Researcher")
+@restrict_user(current_user, ['Researcher'])
 def view_project():
 
     project_id = request.args.get('project_id')
@@ -111,7 +111,7 @@ def view_project():
 
 @researcher.route('/re_upload', methods=["POST"])
 @login_required
-@restrict_user(current_user, "Researcher")
+@restrict_user(current_user, ['Researcher'])
 def re_upload_documents():
     # get needed data from request
     files = request.files.getlist('files')

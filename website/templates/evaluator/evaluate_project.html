@@ -56,6 +56,10 @@
                             name="project_id"
                             value="{{project.id}}">
 
+                        <div class="flex-auto text-right ">
+                            <a href="{{ url_for('document.download_zip', project_id=project.id) }}"
+                                class="text-indigo-600">scarica ZIP file</a>
+                        </div>
                         {% for document in project.documents %}
                         <div class="py-2.5 w-full">
                             <div class="flex text-sm leading-6 text-gray-900 ">

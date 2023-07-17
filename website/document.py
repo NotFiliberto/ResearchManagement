@@ -2,7 +2,7 @@ from flask import Blueprint, flash, redirect, render_template, request, send_fil
 from flask_login import login_required, current_user
 from website.models import Document
 from website.models import Project
-from .utils import download_document, download_zip_documents, get_project, restrict_user
+from .utils import download_document, download_zip_documents, restrict_user
 
 
 document = Blueprint('document', __name__)
@@ -16,10 +16,10 @@ def download():
     file_path = download_document(document_id)
     return send_file(file_path, as_attachment=True)
 
-@document.route('/downloadzip',  methods=['GET', 'POST'])
+@document.route('/download_zip',  methods=['GET', 'POST'])
 @login_required
 @restrict_user(current_user, ['Researcher', 'Evaluator'])
-def downloadzip():
+def download_zip():
     project_id = request.args.get('project_id')
     project = Project.query.filter_by(project_id=project_id).first()
     if project_id is None or project is None:

@@ -26,7 +26,7 @@ def sign_in():
         if user:
             # check password
             if check_password_hash(user.password, password):
-                flash('Accesso avvenuto con succeso', category='success')
+                flash('Accesso avvenuto con successo', category='success')
                 login_user(user, remember=True)
 
                 return redirect(url_for('views.home'))

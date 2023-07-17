@@ -42,7 +42,7 @@ def get_project(project_id):
                       document_id=project_rep.document_id, description=project_rep.description)
         else:
             rep = None
-        dd = D(id=d.id, name=d.file_name, report=rep)
+        dd = D(id=d.id, name=d.filename, report=rep)
         documents.append(dd)
     # Assign each project attribute, researcher and documents included
     project = P(id=p.project_id,
@@ -128,7 +128,7 @@ def get_reports(project_id):
 
 def download_document(document_id):
     d = Document.query.filter_by(id=document_id).first()
-    file_name = standardize_accents(d.file_name)
+    filename = standardize_accents(d.filename)
     sub = str(d.project_id)
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -139,7 +139,7 @@ def download_document(document_id):
     # path to the subfolder
     subfolder_path = os.path.join(folder_outside, sub)
     # path to file
-    file_path = os.path.join(subfolder_path, file_name)
+    file_path = os.path.join(subfolder_path, filename)
     # return the file path and ONY then you can send the file as a return
     return file_path
 
@@ -174,7 +174,7 @@ def download_zip_documents(project_id):
 
 def re_upload(doc):
     sub = str(doc.project_id)
-    file_name = standardize_accents(doc.file_name)
+    filename = standardize_accents(doc.filename)
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
     # Absolute path outside current path(website) -> current path - 1
@@ -184,7 +184,7 @@ def re_upload(doc):
     # path to the subfolder
     subfolder_path = os.path.join(folder_outside, sub)
     # build entire file path
-    file_path = os.path.join(subfolder_path, file_name)
+    file_path = os.path.join(subfolder_path, filename)
     # remove file
     os.remove(file_path)
     # return file_path and use it to save the file in that path

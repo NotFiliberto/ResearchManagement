@@ -94,7 +94,7 @@ def create_project():
     return render_template('researcher/create.html', user=current_user)
 
 
-@researcher.route('/project/', methods=['GET'])
+@researcher.route('/project', methods=['GET'])
 @login_required
 @restrict_user(current_user, ['Researcher'])
 def view_project():
@@ -106,6 +106,10 @@ def view_project():
         flash('Non esistono progetti corrispondenti nel DB', category='error')
         return redirect(url_for('researcher.researcher_home'))
     else:
+
+        if project.researcher_id is not current_user.id:
+            return redirect(url_for('static', filename='401.html'))
+
         return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
 
 

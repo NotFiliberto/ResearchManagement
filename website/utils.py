@@ -10,6 +10,7 @@ from collections import namedtuple
 from . import db
 import unicodedata
 
+
 def standardize_accents(string):
     return ''.join(c for c in unicodedata.normalize('NFD', string) if not unicodedata.combining(c))
 
@@ -18,36 +19,53 @@ def standardize_accents(string):
 
 
 def get_project(project_id):
+
     # Define the models dictionary based on the attributes of the reflected tables
     project_columns = Project.__table__.columns.keys()
     researcher_columns = User.__table__.columns.keys()
     document_columns = Document.__table__.columns.keys()
     report_columns = Report.__table__.columns.keys()
+
     # Use query to select the data using the project_id and create objects-models fields
-    project = db.session.query(Project).filter_by(project_id=project_id).first()
+    project = db.session.query(Project).filter_by(
+        project_id=project_id).first()
     if project is None:
         return None
-    researcher = db.session.query(Researcher).filter_by(id=project.researcher_id).first()
-    RES = namedtuple('RES', researcher_columns)
-    REP = namedtuple('REP', report_columns)
+    researcher = db.session.query(Researcher).filter_by(
+        id=project.researcher_id).first()
+
+    # create namedtuples
+    Researcher_Namedtuple = namedtuple(
+        Researcher.__dict__["__tablename__"].lower(), researcher_columns)
+    Report_Namedtuple = namedtuple(
+        Report.__dict__["__tablename__"].lower(), report_columns)
     document_columns.append('report')
-    D = namedtuple('D', document_columns)
+    Document_Namedtuple = namedtuple(
+        Document.__dict__["__tablename__"].lower(), document_columns)
+
     project_columns.append('researcher')
     project_columns.append('documents')
-    P = namedtuple('P', project_columns)
+    Project_Namedtuple = namedtuple(
+        Project.__dict__["__tablename__"].lower(), project_columns)
+
     # create an instance of the object-models
-    res_dict = RES(**{key: value for key, value in researcher.__dict__.items() if key in researcher_columns})
+    res_dict = Researcher_Namedtuple(
+        **{key: value for key, value in researcher.__dict__.items() if key in researcher_columns})
     documents = []
     for d in Document.query.filter_by(project_id=project_id):
         project_rep = Report.query.filter_by(document_id=d.id).first()
         if project_rep is not None:
-            rep_dict = REP(**{key: value for key, value in project_rep.__dict__.items() if key in report_columns})
-            d_dict = D(**{key: value for key, value in d.__dict__.items() if key in document_columns}, report=rep_dict)
+            rep_dict = Report_Namedtuple(
+                **{key: value for key, value in project_rep.__dict__.items() if key in report_columns})
         else:
-            d_dict = D(**{key: value for key, value in d.__dict__.items() if key in document_columns}, report=None)
+            rep_dict = None
+
+        # assign report to document
+        d_dict = Document_Namedtuple(**{key: value for key, value in d.__dict__.items()
+                                        if key in document_columns}, report=rep_dict)
         documents.append(d_dict)
-    project_dict = P(**{key: value for key, value in project.__dict__.items() if key in project_columns},
-                     researcher=res_dict, documents=documents)
+    project_dict = Project_Namedtuple(**{key: value for key, value in project.__dict__.items() if key in project_columns},
+                                      researcher=res_dict, documents=documents)
 
     return project_dict
 

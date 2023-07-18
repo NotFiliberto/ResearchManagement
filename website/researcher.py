@@ -110,8 +110,6 @@ def view_project():
         if project.researcher_id is not current_user.id:
             return redirect(url_for('static', filename='401.html'))
 
-        print(project.researcher)
-
         return render_template('researcher/project.html', user=current_user, project=project, project_statuses=ProjectStatus)
 
 

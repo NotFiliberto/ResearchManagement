@@ -27,7 +27,7 @@ def download_zip():
         return redirect(url_for('static', filename='404.html'))
     zip_buffer = download_zip_documents(project_id)
     if p.name is not None:
-        name = 'project_{}_files.zip'.format(p.name)
+        name = 'project_files.zip'.format(p.name)
     else:
         name = 'project_files.zip'
     return send_file(zip_buffer, as_attachment=True, download_name=name)

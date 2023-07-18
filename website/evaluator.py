@@ -33,15 +33,15 @@ def evaluate_project():
         project_id = request.form.get('project_id')
         # get project
         project = get_project(project_id)
-        flash(f"{project.name} valutato! [{status}]", category="success")
+        flash(f"{project['name']} valutato! [{status}]", category="success")
         # set the new status given by evaluator
         change_project_state(status, project)
         # for each document, create a report
         i = 0
-        for d in project.documents:
+        for d in project['documents']:
             # gets the n-ary text area
-            description = request.form['document_' + str(d.id)]
+            description = request.form['document_' + str(d['id'])]
             # there's only one report for each document (maximum)
-            create_report(d.id, current_user.id, description)
+            create_report(d['id'], current_user.id, description)
             i += 1
         return redirect(url_for('evaluator.evaluator_home', user=current_user))

@@ -1,10 +1,10 @@
 import io
 import os
 import zipfile
-
 from website.config import PROJECT_FILES_FOLDER
-from .models import Project, Researcher, Document, ProjectStatus, Report
+from .models import Project, Researcher, Document, ProjectStatus, Report, User
 from flask import redirect, url_for
+from sqlalchemy import MetaData
 from functools import wraps
 from collections import namedtuple
 from . import db
@@ -15,44 +15,43 @@ def standardize_accents(string):
 
 
 # tested, added documents[i].report
+
+
 def get_project(project_id):
-    # getting info from queries
-    p = Project.query.filter_by(project_id=project_id).first()
-
-    if (p is None):
+    # Reflect the DB schema using MetaData.reflect()
+    db.metadata.reflect(bind=db.engine)
+    # Define the models dictionary based on the attributes of the reflected tables
+    project_columns = Project.__table__.columns.keys()
+    researcher_columns = User.__table__.columns.keys()
+    document_columns = Document.__table__.columns.keys()
+    report_columns = Report.__table__.columns.keys()
+    project = db.session.query(Project).filter_by(project_id=project_id).first()
+    if project is None:
         return None
-
-    r = Researcher.query.filter_by(id=p.researcher_id).first()
+    researcher = db.session.query(Researcher).filter_by(id=project.researcher_id).first()
+    res_dict = {key: value for key, value in researcher.__dict__.items() if key in researcher_columns}
     docs = Document.query.filter_by(project_id=project_id)
-    # creating new models for project obj
-    P = namedtuple('P', ['id', 'name', 'description',
-                   'status', 'researcher', 'documents'])
-    Res = namedtuple('R', ['id', 'name', 'username'])
-    D = namedtuple('D', ['id', 'name', 'report'])
-    REP = namedtuple('REP', ['id', 'evaluator_id',
-                     'document_id', 'description'])
-    # create a researcher object to assign to its project obj
-    res = Res(id=r.id, name=r.email, username=r.username)
-    # create a document list to assign to its project obj
     documents = []
     for d in docs:
         project_rep = Report.query.filter_by(document_id=d.id).first()
         if project_rep is not None:
-            rep = REP(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id,
-                      document_id=project_rep.document_id, description=project_rep.description)
+            rep_dict = {key: value for key, value in project_rep.__dict__.items() if key in report_columns}
+            d_dict = {key: value for key, value in d.__dict__.items() if key in document_columns}
+            d_dict['report'] = rep_dict
         else:
-            rep = None
-        dd = D(id=d.id, name=d.filename, report=rep)
-        documents.append(dd)
-    # Assign each project attribute, researcher and documents included
-    project = P(id=p.project_id,
-                name=p.name,
-                description=p.description,
-                status=p.status,
-                researcher=res,
-                documents=documents
-                )
-    return project
+            rep_dict = None
+            d_dict = {key: value for key, value in d.__dict__.items() if key in document_columns}
+            d_dict['report'] = rep_dict
+        documents.append(d_dict)
+
+    project_dict = {key: value for key, value in project.__dict__.items() if key in project_columns}
+    print("\n\n",res_dict, "\n\n")
+    project_dict['researcher'] = res_dict
+    project_dict['documents'] = documents
+
+    return project_dict
+
+
 
 # tested, usage: restrict access to pages with this route decorator
 
@@ -75,11 +74,11 @@ def restrict_user(current_user, authorized_types):
 
 
 def change_project_state(status, project):
-    if status != project.status:
-        p = Project.query.filter_by(project_id=project.id).first()
+    if status != project['status']:
+        p = Project.query.filter_by(project_id=project['project_id']).first()
         p.status = status
         db.session.commit()
-        project = get_project(project.id)
+        project = get_project(project['project_id'])
         return project
 
 # tested
@@ -116,9 +115,9 @@ def create_report(document_id, evaluator_id, description):
 def get_reports(project_id):
     p = get_project(project_id)
     reports = []
-    for d in p.documents:
-        if d.report is not None:
-            reports.append(d.report)
+    for d in p['documents']:
+        if d['report'] is not None:
+            reports.append(d['report'])
 
     return reports
 
@@ -153,9 +152,9 @@ def download_document(document_id):
 def download_zip_documents(project_id):
     p = get_project(project_id)
     file_paths = []
-    for d in p.documents:
+    for d in p['documents']:
         # download_document returns the path of the file so you can download it
-        file_paths.append(download_document(d.id))
+        file_paths.append(download_document(d['id']))
        # Create .zip temporary file in memory
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w') as zipf:

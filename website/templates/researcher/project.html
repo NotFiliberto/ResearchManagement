@@ -27,12 +27,18 @@
                 {% include 'project_status_badge.html' %}
                 {% endwith %}
             </div>
+            <div class="flex-auto text-base text-right">
+                <a href="{{ url_for('document.download_zip', project_id=project.project_id) }}"
+                    class="text-indigo-600">scarica progetto</a>
+            </div>
         </div>
         <div class="text-normal">
             <p>
                 {{ project.description }}
             </p>
+
         </div>
+
     </div>
 
 
@@ -43,16 +49,14 @@
 
         <div class="py-2">
             <h1 class="text-xl  font-semibold">Documenti sottomessi</h1>
+
             <p class="italic py-2">Qua puoi vedere lo stato attuale del progetto e degli eventuali report di
                 valutazioni per i documenti che hai sottomesso.</p>
         </div>
         <div class=" inset-0 flex items-center"
             aria-hidden="true">
             <div class="w-full border-t border-gray-300">
-                <div class="flex-auto text-right ">
-                    <a href="{{ url_for('document.download_zip', project_id=project.project_id) }}"
-                        class="text-indigo-600">scarica ZIP file</a>
-                </div>
+
                 {% for document in project.documents %}
                 <div class="py-2.5 w-full">
                     <div class="flex text-sm leading-6 text-gray-900 ">

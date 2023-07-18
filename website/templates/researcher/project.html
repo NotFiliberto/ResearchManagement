@@ -1,0 +1,107 @@
+{% extends "base.html" %} {% block title %}Researcher Home{% endblock %}
+{% block content %}
+
+<div class="mx-auto max-w-2xl pt-32 w-full">
+
+    <div class="text-left w-full mb-10 text-xl">
+        <div class="text-center py-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            {% if category == "error" %}
+            <div class="text-red-400">{{message}}</div>
+            {% elif category == 'success' %}
+            <div class="text-green-400">{{message}}</div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="flex items-center">
+            <h1 class="inline font-bold text-3xl">
+                {{ project.name }}
+            </h1>
+            <div class="inline-block px-3 text-center">
+                {% with status=project.status %}
+                {% include 'project_status_badge.html' %}
+                {% endwith %}
+            </div>
+            <div class="flex-auto text-base text-right">
+                <a href="{{ url_for('document.download_zip', project_id=project.project_id) }}"
+                    class="text-indigo-600">scarica progetto</a>
+            </div>
+        </div>
+        <div class="text-normal">
+            <p>
+                {{ project.description }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class=" py-5">
+        <!-- Heading progetti -->
+
+        <div class="py-6" />
+
+        <div class="py-2">
+            <h1 class="text-xl  font-semibold">Documenti sottomessi</h1>
+
+            <p class="italic py-2">Qua puoi vedere lo stato attuale del progetto e degli eventuali report di
+                valutazioni per i documenti che hai sottomesso.</p>
+        </div>
+        <div class=" inset-0 flex items-center"
+            aria-hidden="true">
+            <div class="w-full border-t border-gray-300">
+
+                {% for document in project.documents %}
+                <div class="py-2.5 w-full">
+                    <div class="flex text-sm leading-6 text-gray-900 ">
+                        <label for="{{ document.filename }}"
+                            class="text-base font-semibold leading-7 text-gray-900">{{ document.filename }}</label>
+                        <div class="flex-auto text-right ">
+                            <a href="{{ url_for('document.download', document_id=document.id) }}"
+                                class="text-indigo-600">scarica</a>
+                        </div>
+
+                    </div>
+
+                    {% if (document.report is not none) %}
+                    <div class="mt-2 text-base leading-7 text-gray-600">
+                        {{ document.report.description }}
+                    </div>
+                    {% else %}
+                    <div class="mt-2 text-base leading-7 text-gray-600">
+                        Documento in attesa di valutazione...
+                    </div>
+                    {% endif %}
+
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="py-12" />
+
+        <form action="/researcher/re_upload"
+            class="w-full"
+            method="POST"
+            enctype="multipart/form-data">
+            <input type="hidden"
+                name="project_id"
+                value="{{ project.project_id }}">
+            {% if project.status == project_statuses.REQUIRES_CHANGES %}
+            {% with form_name_reference="files", submit_button_text="Richiedi nuova valutazione" %}
+            {% include 'file_uploader.html' %}
+            {% endwith %}
+            {% endif %}
+        </form>
+
+
+    </div>
+</div>
+
+{% endblock %}

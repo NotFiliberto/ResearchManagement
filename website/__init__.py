@@ -1,29 +1,39 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager  # essential for managing signed in users
+from flask_login import LoginManager
+
+# essential for managing signed in users
+from website.config import DB_STRING, FLASK_SECRET_KEY
 
 db = SQLAlchemy()
-DB_NAME = "database.db"
 
 
 def create_app():
     app = Flask(__name__)  # name of the file
 
-    app.config['SECRET_KEY'] = 'notFil6e660'  # use .env file in production
+    # TODO use .env file in production
+    app.config['SECRET_KEY'] = FLASK_SECRET_KEY
+
     # TODO change sqlite with postgressql (look up docs)
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = DB_STRING
 
     db.init_app(app)  # init db
 
     # blueprints
     from .views import views
     from .auth import auth
+    from .evaluator import evaluator
+    from .researcher import researcher
+    from .document import document
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(evaluator, url_prefix='/evaluator')
+    app.register_blueprint(researcher, url_prefix='/researcher')
+    app.register_blueprint(document, url_prefix='/document')
 
     # create db
-    from .models import User, Note
+    from .models import User
 
     with app.app_context():
         db.create_all()

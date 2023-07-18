@@ -23,29 +23,31 @@ def get_project(project_id):
     researcher_columns = User.__table__.columns.keys()
     document_columns = Document.__table__.columns.keys()
     report_columns = Report.__table__.columns.keys()
+    # Use query to select the data using the project_id and create objects-models fields
     project = db.session.query(Project).filter_by(project_id=project_id).first()
     if project is None:
         return None
     researcher = db.session.query(Researcher).filter_by(id=project.researcher_id).first()
-    res_dict = {key: value for key, value in researcher.__dict__.items() if key in researcher_columns}
-    docs = Document.query.filter_by(project_id=project_id)
+    RES = namedtuple('RES', researcher_columns)
+    REP = namedtuple('REP', report_columns)
+    document_columns.append('report')
+    D = namedtuple('D', document_columns)
+    project_columns.append('researcher')
+    project_columns.append('documents')
+    P = namedtuple('P', project_columns)
+    # create an instance of the object-models
+    res_dict = RES(**{key: value for key, value in researcher.__dict__.items() if key in researcher_columns})
     documents = []
-    for d in docs:
+    for d in Document.query.filter_by(project_id=project_id):
         project_rep = Report.query.filter_by(document_id=d.id).first()
         if project_rep is not None:
-            rep_dict = {key: value for key, value in project_rep.__dict__.items() if key in report_columns}
-            d_dict = {key: value for key, value in d.__dict__.items() if key in document_columns}
-            d_dict['report'] = rep_dict
+            rep_dict = REP(**{key: value for key, value in project_rep.__dict__.items() if key in report_columns})
+            d_dict = D(**{key: value for key, value in d.__dict__.items() if key in document_columns}, report=rep_dict)
         else:
-            rep_dict = None
-            d_dict = {key: value for key, value in d.__dict__.items() if key in document_columns}
-            d_dict['report'] = rep_dict
+            d_dict = D(**{key: value for key, value in d.__dict__.items() if key in document_columns}, report=None)
         documents.append(d_dict)
-
-    project_dict = {key: value for key, value in project.__dict__.items() if key in project_columns}
-    print("\n\n",res_dict, "\n\n")
-    project_dict['researcher'] = res_dict
-    project_dict['documents'] = documents
+    project_dict = P(**{key: value for key, value in project.__dict__.items() if key in project_columns},
+                     researcher=res_dict, documents=documents)
 
     return project_dict
 
@@ -71,11 +73,11 @@ def restrict_user(current_user, authorized_types):
 
 
 def change_project_state(status, project):
-    if status != project['status']:
-        p = Project.query.filter_by(project_id=project['project_id']).first()
+    if status != project.status:
+        p = Project.query.filter_by(project_id=project.project_id).first()
         p.status = status
         db.session.commit()
-        project = get_project(project['project_id'])
+        project = get_project(project.project_id)
         return project
 
 # tested
@@ -112,9 +114,9 @@ def create_report(document_id, evaluator_id, description):
 def get_reports(project_id):
     p = get_project(project_id)
     reports = []
-    for d in p['documents']:
-        if d['report'] is not None:
-            reports.append(d['report'])
+    for d in p.documents:
+        if d.report is not None:
+            reports.append(d.report)
 
     return reports
 
@@ -149,9 +151,9 @@ def download_document(document_id):
 def download_zip_documents(project_id):
     p = get_project(project_id)
     file_paths = []
-    for d in p['documents']:
+    for d in p.documents:
         # download_document returns the path of the file so you can download it
-        file_paths.append(download_document(d['id']))
+        file_paths.append(download_document(d.id))
        # Create .zip temporary file in memory
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w') as zipf:

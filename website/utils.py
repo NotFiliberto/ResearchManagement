@@ -18,8 +18,6 @@ def standardize_accents(string):
 
 
 def get_project(project_id):
-    # Reflect the DB schema using MetaData.reflect()
-    db.metadata.reflect(bind=db.engine)
     # Define the models dictionary based on the attributes of the reflected tables
     project_columns = Project.__table__.columns.keys()
     researcher_columns = User.__table__.columns.keys()
@@ -50,7 +48,6 @@ def get_project(project_id):
     project_dict['documents'] = documents
 
     return project_dict
-
 
 
 # tested, usage: restrict access to pages with this route decorator

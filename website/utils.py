@@ -57,11 +57,12 @@ def get_project(project_id):
         if project_rep is not None:
             rep_dict = Report_Namedtuple(
                 **{key: value for key, value in project_rep.__dict__.items() if key in report_columns})
-            d_dict = Document_Namedtuple(**{key: value for key, value in d.__dict__.items()
-                                            if key in document_columns}, report=rep_dict)
         else:
-            d_dict = Document_Namedtuple(**{key: value for key, value in d.__dict__.items()
-                                            if key in document_columns}, report=None)
+            rep_dict = None
+
+        # assign report to document
+        d_dict = Document_Namedtuple(**{key: value for key, value in d.__dict__.items()
+                                        if key in document_columns}, report=rep_dict)
         documents.append(d_dict)
     project_dict = Project_Namedtuple(**{key: value for key, value in project.__dict__.items() if key in project_columns},
                                       researcher=res_dict, documents=documents)

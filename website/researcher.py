@@ -81,7 +81,7 @@ def create_project():
                 continue
             # Create a document only if file does not already exists, then ADD into DB
             document = Document(
-                file_extension=extension, file_name=filename, project_id=project.project_id)
+                file_extension=extension, filename=filename, project_id=project.project_id)
             db.session.add(document)
             db.session.commit()
             # save file in the right folder
@@ -129,7 +129,7 @@ def re_upload_documents():
     for file in files:
         filename = file.filename
         doc = Document.query.filter_by(
-            file_name=filename, project_id=project_id).first()
+            filename=filename, project_id=project_id).first()
         if doc is not None:
             docs.append(doc)
         else:

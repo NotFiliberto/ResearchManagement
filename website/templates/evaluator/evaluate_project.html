@@ -17,12 +17,12 @@
             {% endif %}
             {% endwith %}
         </div>
-        <h1 class="font-bold text-3xl">{{project.name}}</h1>
+        <h1 class="font-bold text-3xl">{{ project.name }}</h1>
         <div class="text-normal">
             <p>
-                {{project.description}}
+                {{ project.description }}
             </p>
-            <div class="italic text-sm"> di <span class="text-indigo-600 font-bold">{{project.researcher.name}}</span>
+            <div class="italic text-sm"> di <span class="text-indigo-600 font-bold">{{ project.researcher.username }}</span>
             </div>
         </div>
 
@@ -54,17 +54,17 @@
                         method="POST">
                         <input type="hidden"
                             name="project_id"
-                            value="{{project.id}}">
+                            value="{{ project.project_id }}">
 
                         <div class="flex-auto text-right ">
-                            <a href="{{ url_for('document.download_zip', project_id=project.id) }}"
+                            <a href="{{ url_for('document.download_zip', project_id=project.project_id) }}"
                                 class="text-indigo-600">scarica ZIP file</a>
                         </div>
                         {% for document in project.documents %}
                         <div class="py-2.5 w-full">
                             <div class="flex text-sm leading-6 text-gray-900 ">
-                                <label for="{{document.name}}"
-                                    class="font-medium">{{document.name}}</label>
+                                <label for="{{ document.filename }}"
+                                    class="font-medium">{{ document.filename }}</label>
                                 <div class="flex-auto text-right ">
                                     <a href="{{ url_for('document.download', document_id=document.id) }}"
                                         class="text-indigo-600">scarica</a>
@@ -73,11 +73,11 @@
                             </div>
 
                             <div class="mt-2">
-                                <textarea id="{{document.name}}"
-                                    name="document_{{document.id}}"
+                                <textarea id="{{ document.filename }}"
+                                    name="document_{{ document.id }}"
                                     rows="3"
                                     required
-                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">{{document.report.description}}</textarea>
+                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">{{ document.report.description }}</textarea>
                             </div>
                         </div>
                         {% endfor %}

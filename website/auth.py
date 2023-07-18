@@ -51,9 +51,6 @@ def signout():
 @auth.route('/signup', methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
-        data = request.form
-        print(data)
-
         # TODO validation logic
         username = request.form.get('username')
         email = request.form.get('email')

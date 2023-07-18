@@ -71,7 +71,7 @@ class Project(db.Model):
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     file_extension = db.Column(db.String(10))
-    file_name = db.Column(db.String(150))
+    filename = db.Column(db.String(150))
     project_id = db.Column(db.Integer, db.ForeignKey(
         'project.project_id'))
 

@@ -1,10 +1,10 @@
 import io
 import os
 import zipfile
-
 from website.config import PROJECT_FILES_FOLDER
-from .models import Project, Researcher, Document, ProjectStatus, Report
+from .models import Project, Researcher, Document, ProjectStatus, Report, User
 from flask import redirect, url_for
+from sqlalchemy import MetaData
 from functools import wraps
 from collections import namedtuple
 from . import db
@@ -15,44 +15,42 @@ def standardize_accents(string):
 
 
 # tested, added documents[i].report
+
+
 def get_project(project_id):
-    # getting info from queries
-    p = Project.query.filter_by(project_id=project_id).first()
-
-    if (p is None):
+    # Define the models dictionary based on the attributes of the reflected tables
+    project_columns = Project.__table__.columns.keys()
+    researcher_columns = User.__table__.columns.keys()
+    document_columns = Document.__table__.columns.keys()
+    report_columns = Report.__table__.columns.keys()
+    # Use query to select the data using the project_id and create objects-models fields
+    project = db.session.query(Project).filter_by(project_id=project_id).first()
+    if project is None:
         return None
-
-    r = Researcher.query.filter_by(id=p.researcher_id).first()
-    docs = Document.query.filter_by(project_id=project_id)
-    # creating new models for project obj
-    P = namedtuple('P', ['id', 'name', 'description',
-                   'status', 'researcher', 'documents'])
-    Res = namedtuple('R', ['id', 'name', 'username'])
-    D = namedtuple('D', ['id', 'name', 'report'])
-    REP = namedtuple('REP', ['id', 'evaluator_id',
-                     'document_id', 'description'])
-    # create a researcher object to assign to its project obj
-    res = Res(id=r.id, name=r.email, username=r.username)
-    # create a document list to assign to its project obj
+    researcher = db.session.query(Researcher).filter_by(id=project.researcher_id).first()
+    RES = namedtuple('RES', researcher_columns)
+    REP = namedtuple('REP', report_columns)
+    document_columns.append('report')
+    D = namedtuple('D', document_columns)
+    project_columns.append('researcher')
+    project_columns.append('documents')
+    P = namedtuple('P', project_columns)
+    # create an instance of the object-models
+    res_dict = RES(**{key: value for key, value in researcher.__dict__.items() if key in researcher_columns})
     documents = []
-    for d in docs:
+    for d in Document.query.filter_by(project_id=project_id):
         project_rep = Report.query.filter_by(document_id=d.id).first()
         if project_rep is not None:
-            rep = REP(id=project_rep.report_id, evaluator_id=project_rep.evaluator_id,
-                      document_id=project_rep.document_id, description=project_rep.description)
+            rep_dict = REP(**{key: value for key, value in project_rep.__dict__.items() if key in report_columns})
+            d_dict = D(**{key: value for key, value in d.__dict__.items() if key in document_columns}, report=rep_dict)
         else:
-            rep = None
-        dd = D(id=d.id, name=d.file_name, report=rep)
-        documents.append(dd)
-    # Assign each project attribute, researcher and documents included
-    project = P(id=p.project_id,
-                name=p.name,
-                description=p.description,
-                status=p.status,
-                researcher=res,
-                documents=documents
-                )
-    return project
+            d_dict = D(**{key: value for key, value in d.__dict__.items() if key in document_columns}, report=None)
+        documents.append(d_dict)
+    project_dict = P(**{key: value for key, value in project.__dict__.items() if key in project_columns},
+                     researcher=res_dict, documents=documents)
+
+    return project_dict
+
 
 # tested, usage: restrict access to pages with this route decorator
 
@@ -76,10 +74,10 @@ def restrict_user(current_user, authorized_types):
 
 def change_project_state(status, project):
     if status != project.status:
-        p = Project.query.filter_by(project_id=project.id).first()
+        p = Project.query.filter_by(project_id=project.project_id).first()
         p.status = status
         db.session.commit()
-        project = get_project(project.id)
+        project = get_project(project.project_id)
         return project
 
 # tested
@@ -128,8 +126,7 @@ def get_reports(project_id):
 
 def download_document(document_id):
     d = Document.query.filter_by(id=document_id).first()
-    print("\nFILE: ",d, " ", d.file_name, "\n")
-    file_name = standardize_accents(d.file_name)
+    filename = standardize_accents(d.filename)
     sub = str(d.project_id)
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -140,7 +137,7 @@ def download_document(document_id):
     # path to the subfolder
     subfolder_path = os.path.join(folder_outside, sub)
     # path to file
-    file_path = os.path.join(subfolder_path, file_name)
+    file_path = os.path.join(subfolder_path, filename)
     # return the file path and ONY then you can send the file as a return
     return file_path
 
@@ -155,7 +152,6 @@ def download_zip_documents(project_id):
     p = get_project(project_id)
     file_paths = []
     for d in p.documents:
-        print("\ndocument: ", d, "\n")
         # download_document returns the path of the file so you can download it
         file_paths.append(download_document(d.id))
        # Create .zip temporary file in memory
@@ -176,7 +172,7 @@ def download_zip_documents(project_id):
 
 def re_upload(doc):
     sub = str(doc.project_id)
-    file_name = standardize_accents(doc.file_name)
+    filename = standardize_accents(doc.filename)
     # current path (.py file is stored in website folder)
     current_path = os.path.dirname(os.path.abspath(__file__))
     # Absolute path outside current path(website) -> current path - 1
@@ -186,7 +182,7 @@ def re_upload(doc):
     # path to the subfolder
     subfolder_path = os.path.join(folder_outside, sub)
     # build entire file path
-    file_path = os.path.join(subfolder_path, file_name)
+    file_path = os.path.join(subfolder_path, filename)
     # remove file
     os.remove(file_path)
     # return file_path and use it to save the file in that path

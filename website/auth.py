@@ -51,7 +51,6 @@ def signout():
 @auth.route('/signup', methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
-        # TODO validation logic
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
@@ -66,7 +65,7 @@ def sign_up():
             flash('Lo username come minimo deve avere 3 caratteri',
                   category='error')
         else:
-            # TODO registration logic (db)
+
             try:
                 if (user_type.upper() == "EVALUATOR"):
                     new_user = Evaluator(username=username, email=email, password=generate_password_hash(

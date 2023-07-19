@@ -25,7 +25,7 @@ def researcher_home():
                 (Project.status == 'submitted_for_evaluation', 1),
                 (Project.status == 'approved', 2),
                 (Project.status == 'not_approved', 3)
-            }, else_=4
+            }
         ).asc(),
         desc(Project.created_at)
     ).all()

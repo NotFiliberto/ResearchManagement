@@ -1,7 +1,5 @@
 import os
-
-from sqlalchemy import or_
-
+from sqlalchemy import case, desc, literal
 from website.config import PROJECT_FILES_FOLDER
 from . import db
 from flask import Blueprint, render_template, request, flash, redirect, url_for
@@ -18,10 +16,19 @@ researcher = Blueprint('researcher', __name__)
 # home
 @researcher.route('/',  methods=['GET', 'POST'])
 @login_required
-@restrict_user(current_user, ['Researcher'])  # TODO: FIX SIGN IN
+@restrict_user(current_user, ['Researcher'])
 def researcher_home():
-    projects = Project.query.filter_by(
-        researcher_id=current_user.id).order_by(Project.project_id.desc())
+    projects = Project.query.filter_by(researcher_id=current_user.id).order_by(
+        case(
+            {
+                (Project.status == 'requires_changes', 0),
+                (Project.status == 'submitted_for_evaluation', 1),
+                (Project.status == 'approved', 2),
+                (Project.status == 'not_approved', 3)
+            }
+        ).asc(),
+        desc(Project.created_at)
+    ).all()
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)
 
 

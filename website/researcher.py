@@ -26,7 +26,7 @@ def researcher_home():
                 (Project.status == 'approved', 2),
                 (Project.status == 'not_approved', 3)
             }, else_=4
-        ).asc(),  # Ordine decrescente per data di creazione
+        ).asc(),
         desc(Project.created_at)
     ).all()
     return render_template('researcher/home.html', user=current_user, projects=projects, project_statuses=ProjectStatus)

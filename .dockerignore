@@ -5,3 +5,7 @@ project_files/
 instance/database.db
 *.zip
 *.tar
+
+.git/
+.vscode/
+.researchmanagement/

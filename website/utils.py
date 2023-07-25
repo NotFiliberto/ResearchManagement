@@ -207,8 +207,7 @@ def re_upload(doc):
     return file_path
 
 
-def get_evaluation_interval_by_id(evaluation_in
-                                  terval_id):
+def get_evaluation_interval_by_id(evaluation_interval_id):
     interval_columns = Evaluation_Interval.__table__.columns.keys()
 
     interval = Evaluation_Interval.query.filter_by(evaluation_interval_id=evaluation_interval_id).first()

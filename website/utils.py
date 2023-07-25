@@ -4,7 +4,6 @@ import zipfile
 from website.config import PROJECT_FILES_FOLDER
 from .models import Project, Researcher, Document, Report, User, Evaluation_Interval
 from flask import redirect, url_for
-from sqlalchemy import MetaData
 from functools import wraps
 from collections import namedtuple
 from . import db

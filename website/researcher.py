@@ -44,6 +44,8 @@ def create_project():
         # Saving data request form into DB Project
         project_name = request.form.get('project_name')
         project_description = request.form.get('description')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
         # Check number of uploading files
         files = request.files.getlist("files")
         file_str = str(files)

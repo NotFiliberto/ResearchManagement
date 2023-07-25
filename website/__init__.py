@@ -25,12 +25,15 @@ def create_app():
     from .evaluator import evaluator
     from .researcher import researcher
     from .document import document
+    from .evaluation_interval import evaluation_interval
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(evaluator, url_prefix='/evaluator')
     app.register_blueprint(researcher, url_prefix='/researcher')
     app.register_blueprint(document, url_prefix='/document')
+    app.register_blueprint(evaluation_interval,
+                           url_prefix='/evaluation_interval')
 
     # create db
     from .models import User

@@ -205,3 +205,7 @@ def re_upload(doc):
     os.remove(file_path)
     # return file_path and use it to save the file in that path
     return file_path
+
+
+def get_evaluation_interval_by_id(evaluation_iterval_id):
+    return None

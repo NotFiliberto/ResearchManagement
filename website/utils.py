@@ -228,8 +228,6 @@ def re_upload(doc):
 
 def get_evaluation_interval_by_id(evaluation_interval_id):
     interval = Evaluation_Interval.query.filter_by(evaluation_interval_id=evaluation_interval_id).first()
-    if interval is None:
-        return None
     return interval
 
 # tested

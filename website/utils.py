@@ -15,9 +15,7 @@ def standardize_accents(string):
     return ''.join(c for c in unicodedata.normalize('NFD', string) if not unicodedata.combining(c))
 
 
-# tested, added documents[i].report, added project.evaluation_interval:
-# an ev. interval must exists to make it work -> must not create project without 
-# an interval associated
+# tested, added documents[i].report, added project.evaluation_interval: works if interval is None
 
 
 def get_project(project_id):
@@ -33,11 +31,13 @@ def get_project(project_id):
     project = db.session.query(Project).filter_by(
         project_id=project_id).first()
     if project is None:
-        return None
+        return None    
+    
     researcher = db.session.query(Researcher).filter_by(
         id=project.researcher_id).first()
     evaluation_interval = db.session.query(Evaluation_Interval).filter_by(
         evaluation_interval_id=project.evaluation_interval_id).first()
+
     # create namedtuples
     Researcher_Namedtuple = namedtuple(
         Researcher.__dict__["__tablename__"].lower(), researcher_columns)
@@ -58,8 +58,8 @@ def get_project(project_id):
     # create an instance of the object-models
     res_dict = Researcher_Namedtuple(
         **{key: value for key, value in researcher.__dict__.items() if key in researcher_columns})
-    evaluation_interval_dict = Evaluation_Interval_NamedTuple(**{key: value for key, value in 
-                evaluation_interval.__dict__.items() if key in evaluation_interval_columns})
+    
+
     documents = []
     for d in Document.query.filter_by(project_id=project_id):
         project_rep = Report.query.filter_by(document_id=d.id).first()
@@ -73,6 +73,14 @@ def get_project(project_id):
         d_dict = Document_Namedtuple(**{key: value for key, value in d.__dict__.items()
                                         if key in document_columns}, report=rep_dict)
         documents.append(d_dict)
+    
+    # make sure the evaluation_interval exist, otherwise set None
+    if project.evaluation_interval_id is  None:
+        evaluation_interval_dict = None
+    else:
+        evaluation_interval_dict = Evaluation_Interval_NamedTuple(**{key: value for key, value in 
+                evaluation_interval.__dict__.items() if key in evaluation_interval_columns})
+        
     project_dict = Project_Namedtuple(**{key: value for key, value in project.__dict__.items() if key in project_columns},
                                       researcher=res_dict, documents=documents, evaluation_interval=evaluation_interval_dict)
 

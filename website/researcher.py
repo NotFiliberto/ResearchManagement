@@ -37,7 +37,9 @@ def researcher_home():
 @restrict_user(current_user, ['Researcher'])
 def create_project():
     if request.method == "GET":
-        return render_template('researcher/create.html', user=current_user)
+        # Needs to know the list of valid intervals
+        evaluation_intervals = get_all_evaluation_intervals()
+        return render_template('researcher/create.html', user=current_user, evaluation_intervals=evaluation_intervals)
     if request.method == "POST":
         # Attention: SELECT all the files (.pdf) you need to load ALL AT ONCE -> DON'T DRAG DROP
 

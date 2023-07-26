@@ -15,7 +15,9 @@ def standardize_accents(string):
     return ''.join(c for c in unicodedata.normalize('NFD', string) if not unicodedata.combining(c))
 
 
-# tested, added documents[i].report
+# tested, added documents[i].report, added project.evaluation_interval:
+# an ev. interval must exists to make it work -> must not create project without 
+# an interval associated
 
 
 def get_project(project_id):
@@ -213,14 +215,18 @@ def re_upload(doc):
     # return file_path and use it to save the file in that path
     return file_path
 
-# to test
+# tested
+
+
 def get_evaluation_interval_by_id(evaluation_interval_id):
     interval = Evaluation_Interval.query.filter_by(evaluation_interval_id=evaluation_interval_id).first()
     if interval is None:
         return None
     return interval
 
-# to test
+# tested
+
+
 def get_all_evaluation_intervals():
     # these intervals will be showed up for create_project form data
     intervals = Evaluation_Interval.query.filter(Evaluation_Interval.end > datetime.date(datetime.now())).order_by(

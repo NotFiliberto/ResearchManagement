@@ -48,9 +48,8 @@ def create_project():
         project_description = request.form.get('description')
         ev_interval_id = request.form.get('evaluation_interval_id')
         # check if interval_id matches with a valid interval (current date)
-        valid_intervals = get_all_evaluation_intervals()
         interval_selected = get_evaluation_interval_by_id(ev_interval_id)
-        if interval_selected not in valid_intervals:
+        if interval_selected is None:
             ev_interval_id = None
         # Check number of uploading files
         files = request.files.getlist("files")

@@ -25,7 +25,7 @@ def evaluation_interval_page():
         db.session.add(new_evaluation_interval)
         db.session.commit()
 
-    interval_list = Evaluation_Interval.query.filter_by().order_by(
+    interval_list = Evaluation_Interval.query.order_by(
         Evaluation_Interval.end.desc()).all()
     # always return evaluation_interval list
     return render_template('create_evaluation_interval.html', evaluation_intervals=interval_list)

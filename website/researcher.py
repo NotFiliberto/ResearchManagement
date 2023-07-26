@@ -7,7 +7,7 @@ from flask import Flask
 from flask_login import login_required, current_user
 from .models import Project, ProjectStatus, Document
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_project, re_upload, change_project_state, standardize_accents
+from .utils import restrict_user, get_project, re_upload, change_project_state, standardize_accents, get_evaluation_interval_by_id, get_all_evaluation_intervals
 
 
 researcher = Blueprint('researcher', __name__)
@@ -44,8 +44,12 @@ def create_project():
         # Saving data request form into DB Project
         project_name = request.form.get('project_name')
         project_description = request.form.get('description')
-        start_date = request.form.get('start_date')
-        end_date = request.form.get('end_date')
+        ev_interval_id = request.form.get('evaluation_interval_id')
+        # check if interval_id matches with a valid interval (current date)
+        valid_intervals = get_all_evaluation_intervals()
+        interval_selected = get_evaluation_interval_by_id(ev_interval_id)
+        if interval_selected not in valid_intervals:
+            ev_interval_id = None
         # Check number of uploading files
         files = request.files.getlist("files")
         file_str = str(files)
@@ -66,7 +70,7 @@ def create_project():
             pdf_files += 1
         # Creating DB Project (ATTENTION EV_INTERVAL=None -> TESTING PURPOSES)
         project = Project(name=project_name, description=project_description,
-                          evaluation_interval_id=None, status=ProjectStatus.SUBMITTED_FOR_EVALUATION,
+                          evaluation_interval_id=ev_interval_id, status=ProjectStatus.SUBMITTED_FOR_EVALUATION,
                           researcher_id=current_user.id)
         db.session.add(project)
         db.session.commit()

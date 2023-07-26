@@ -1,8 +1,6 @@
 from datetime import datetime
-from flask import Blueprint, render_template, request, flash, redirect, url_for
-
-from website.utils import get_evaluation_interval_by_id
-from .models import Evaluation_Interval, User, Researcher, Evaluator, Project
+from flask import Blueprint, render_template, request
+from .models import Evaluation_Interval
 
 from . import db
 
@@ -27,5 +25,9 @@ def evaluation_interval_page():
 
     interval_list = Evaluation_Interval.query.order_by(
         Evaluation_Interval.end.desc()).all()
+
+    for interval in interval_list:
+        interval.start = interval.start.strftime("%d/%m/%Y")
+        interval.end = interval.end.strftime("%d/%m/%Y")
     # always return evaluation_interval list
     return render_template('create_evaluation_interval.html', evaluation_intervals=interval_list)

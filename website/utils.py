@@ -31,8 +31,8 @@ def get_project(project_id):
     project = db.session.query(Project).filter_by(
         project_id=project_id).first()
     if project is None:
-        return None    
-    
+        return None
+
     researcher = db.session.query(Researcher).filter_by(
         id=project.researcher_id).first()
     evaluation_interval = db.session.query(Evaluation_Interval).filter_by(
@@ -46,7 +46,7 @@ def get_project(project_id):
     document_columns.append('report')
     Document_Namedtuple = namedtuple(
         Document.__dict__["__tablename__"].lower(), document_columns)
-    Evaluation_Interval_NamedTuple = namedtuple(Evaluation_Interval.__dict__["__tablename__"].lower(), 
+    Evaluation_Interval_NamedTuple = namedtuple(Evaluation_Interval.__dict__["__tablename__"].lower(),
                                                 evaluation_interval_columns)
 
     project_columns.append('researcher')
@@ -58,7 +58,6 @@ def get_project(project_id):
     # create an instance of the object-models
     res_dict = Researcher_Namedtuple(
         **{key: value for key, value in researcher.__dict__.items() if key in researcher_columns})
-    
 
     documents = []
     for d in Document.query.filter_by(project_id=project_id):
@@ -73,14 +72,19 @@ def get_project(project_id):
         d_dict = Document_Namedtuple(**{key: value for key, value in d.__dict__.items()
                                         if key in document_columns}, report=rep_dict)
         documents.append(d_dict)
-    
+
     # make sure the evaluation_interval exist, otherwise set None
-    if project.evaluation_interval_id is  None:
+    if project.evaluation_interval_id is None:
         evaluation_interval_dict = None
     else:
-        evaluation_interval_dict = Evaluation_Interval_NamedTuple(**{key: value for key, value in 
-                evaluation_interval.__dict__.items() if key in evaluation_interval_columns})
-        
+        evaluation_interval_dict = Evaluation_Interval_NamedTuple(**{key: value for key, value in
+                                                                     evaluation_interval.__dict__.items() if key in evaluation_interval_columns})
+        # convertion
+        evaluation_interval_dict.start = evaluation_interval_dict.start.strftime(
+            "%d/%m/%Y")
+        evaluation_interval_dict.end = evaluation_interval_dict.end.strftime(
+            "%d/%m/%Y")
+
     project_dict = Project_Namedtuple(**{key: value for key, value in project.__dict__.items() if key in project_columns},
                                       researcher=res_dict, documents=documents, evaluation_interval=evaluation_interval_dict)
 
@@ -227,7 +231,8 @@ def re_upload(doc):
 
 
 def get_evaluation_interval_by_id(evaluation_interval_id):
-    interval = Evaluation_Interval.query.filter_by(evaluation_interval_id=evaluation_interval_id).first()
+    interval = Evaluation_Interval.query.filter_by(
+        evaluation_interval_id=evaluation_interval_id).first()
     return interval
 
 # tested
@@ -237,4 +242,9 @@ def get_all_evaluation_intervals():
     # these intervals will be showed up for create_project form data
     intervals = Evaluation_Interval.query.filter(Evaluation_Interval.end > datetime.date(datetime.now())).order_by(
         Evaluation_Interval.end.desc()).all()
+
+    for interval in intervals:
+        interval.start = interval.start.strftime("%d/%m/%Y")
+        interval.end = interval.end.strftime("%d/%m/%Y")
+
     return intervals

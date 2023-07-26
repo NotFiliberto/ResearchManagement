@@ -2,7 +2,7 @@ import io
 import os
 import zipfile
 from website.config import PROJECT_FILES_FOLDER
-from .models import Project, Researcher, Document, ProjectStatus, Report, User
+from .models import Evaluation_Interval, Project, Researcher, Document, ProjectStatus, Report, User
 from flask import redirect, url_for
 from sqlalchemy import MetaData
 from functools import wraps
@@ -207,5 +207,18 @@ def re_upload(doc):
     return file_path
 
 
-def get_evaluation_interval_by_id(evaluation_iterval_id):
-    return None
+def get_evaluation_interval_by_id(evaluation_interval_id):
+    interval_columns = Evaluation_Interval.__table__.columns.keys()
+
+    interval = Evaluation_Interval.query.filter_by(
+        evaluation_interval_id=evaluation_interval_id).first()
+    if interval is None:
+        return None
+
+    Interval_Namedtuple = namedtuple(
+        Evaluation_Interval.__dict__["__tablename__"].lower(), interval_columns)
+
+    interval_dict = Interval_Namedtuple(
+        **{key: value for key, value in interval.__dict__.items() if key in interval_columns})
+
+    return interval_dict

@@ -36,10 +36,6 @@ def researcher_home():
 @login_required
 @restrict_user(current_user, ['Researcher'])
 def create_project():
-    if request.method == "GET":
-        # Needs to know the list of valid intervals
-        evaluation_intervals = get_all_evaluation_intervals()
-        return render_template('researcher/create.html', user=current_user, evaluation_intervals=evaluation_intervals)
     if request.method == "POST":
         # Attention: SELECT all the files (.pdf) you need to load ALL AT ONCE -> DON'T DRAG DROP
 
@@ -101,11 +97,14 @@ def create_project():
             # save file in the right folder
             file.save(os.path.join(path_save_into, filename))
             i += 1
-    # here means that everything was loaded correctly
-    flash('Progetto creato con successo: ', category='success')
-    flash(str(i) + " di " + str(total) +
-          " file caricati correttamente", category='success')
-    return render_template('researcher/create.html', user=current_user)
+        # here means that everything was loaded correctly
+        flash('Progetto creato con successo: ', category='success')
+        flash(str(i) + " di " + str(total) +
+              " file caricati correttamente", category='success')
+
+    # Needs to know the list of valid intervals
+    evaluation_intervals = get_all_evaluation_intervals()
+    return render_template('researcher/create.html', user=current_user, evaluation_intervals=evaluation_intervals)
 
 
 @researcher.route('/project', methods=['GET'])

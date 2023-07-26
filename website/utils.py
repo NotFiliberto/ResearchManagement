@@ -79,11 +79,6 @@ def get_project(project_id):
     else:
         evaluation_interval_dict = Evaluation_Interval_NamedTuple(**{key: value for key, value in
                                                                      evaluation_interval.__dict__.items() if key in evaluation_interval_columns})
-        # convertion
-        evaluation_interval_dict.start = evaluation_interval_dict.start.strftime(
-            "%d/%m/%Y")
-        evaluation_interval_dict.end = evaluation_interval_dict.end.strftime(
-            "%d/%m/%Y")
 
     project_dict = Project_Namedtuple(**{key: value for key, value in project.__dict__.items() if key in project_columns},
                                       researcher=res_dict, documents=documents, evaluation_interval=evaluation_interval_dict)

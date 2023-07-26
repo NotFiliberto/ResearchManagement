@@ -26,5 +26,8 @@ def evaluation_interval_page():
     interval_list = Evaluation_Interval.query.order_by(
         Evaluation_Interval.end.desc()).all()
 
+    for interval in interval_list:
+        interval.start = interval.start.strftime("%d/%m/%Y")
+        interval.end = interval.end.strftime("%d/%m/%Y")
     # always return evaluation_interval list
     return render_template('create_evaluation_interval.html', evaluation_intervals=interval_list)

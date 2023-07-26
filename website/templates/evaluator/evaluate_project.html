@@ -37,6 +37,9 @@
             <p>
                 {{ project.description }}
             </p>
+            <p class="text-sm">Intervallo di valutazione dal
+                {{project.evaluation_interval.start.__format__("%d/%m/%Y")}} al
+                {{project.evaluation_interval.end.__format__("%d/%m/%Y")}}</p>
             <div class="italic text-sm"> di <span class="text-indigo-600 font-bold">{{ project.researcher.username
                     }}</span>
 

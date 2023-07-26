@@ -112,8 +112,8 @@
             {% for evaluation_interval in evaluation_intervals %}
             <div class="w-full bg-gray-200 p-2 my-2 text-center">
                 <div>id: {{evaluation_interval.evaluation_interval_id}}</div>
-                <div>Inzio: {{evaluation_interval.start}}</div>
-                <div>Fine: {{evaluation_interval.end}}</div>
+                <div>Inzio: {{evaluation_interval.start.__format__("%d/%m/%Y")}}</div>
+                <div>Fine: {{evaluation_interval.end.__format__("%d/%m/%Y")}}</div>
             </div>
             {% endfor %}
         </div>

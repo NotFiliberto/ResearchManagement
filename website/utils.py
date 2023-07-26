@@ -7,6 +7,7 @@ from flask import redirect, url_for
 from functools import wraps
 from collections import namedtuple
 from . import db
+from datetime import datetime
 import unicodedata
 
 
@@ -207,17 +208,13 @@ def re_upload(doc):
 
 
 def get_evaluation_interval_by_id(evaluation_interval_id):
-    interval_columns = Evaluation_Interval.__table__.columns.keys()
-
-    interval = Evaluation_Interval.query.filter_by(
-        evaluation_interval_id=evaluation_interval_id).first()
+    interval = Evaluation_Interval.query.filter_by(evaluation_interval_id=evaluation_interval_id).first()
     if interval is None:
         return None
+    return interval
 
-    Interval_Namedtuple = namedtuple(
-        Evaluation_Interval.__dict__["__tablename__"].lower(), interval_columns)
-
-    interval_dict = Interval_Namedtuple(
-        **{key: value for key, value in interval.__dict__.items() if key in interval_columns})
-
-    return interval_dict
+def get_all_evaluation_intervals():
+    # these intervals will be showed up for create_project form data
+    intervals = Evaluation_Interval.query.filter(Evaluation_Interval.end > datetime.date(datetime.now())).order_by(
+        Evaluation_Interval.end.desc()).all()
+    return intervals

@@ -58,6 +58,20 @@
                                     progetto.
                                 </p>
                             </div>
+
+                            <!-- Evaluation interval  -->
+                            <div class="col-span-full">
+                                <label for="about"
+                                    class="block text-sm font-medium leading-6 text-gray-900">Intervallo di
+                                    valutazione</label>
+                                <div class="mt-2">
+                                    {% with form_name_reference="evaluation_interval_id",
+                                    evaluation_intervals=evaluation_intervals %}
+                                    {% include 'researcher/evaluation_interval_select.html' %}
+                                    {% endwith %}
+                                </div>
+
+                            </div>
                         </div>
 
                     </div>

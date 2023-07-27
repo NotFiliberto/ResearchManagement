@@ -2,12 +2,12 @@ import io
 import os
 import zipfile
 from website.config import PROJECT_FILES_FOLDER
-from .models import Project, Researcher, Document, ProjectStatus, Report, User
+from .models import Evaluation_Interval, Project, Researcher, Document, ProjectStatus, Report, User
 from flask import redirect, url_for
-from sqlalchemy import MetaData
 from functools import wraps
 from collections import namedtuple
 from . import db
+from datetime import datetime
 import unicodedata
 
 
@@ -15,7 +15,7 @@ def standardize_accents(string):
     return ''.join(c for c in unicodedata.normalize('NFD', string) if not unicodedata.combining(c))
 
 
-# tested, added documents[i].report
+# tested, added documents[i].report, added project.evaluation_interval: works if interval is None
 
 
 def get_project(project_id):
@@ -25,14 +25,18 @@ def get_project(project_id):
     researcher_columns = User.__table__.columns.keys()
     document_columns = Document.__table__.columns.keys()
     report_columns = Report.__table__.columns.keys()
+    evaluation_interval_columns = Evaluation_Interval.__table__.columns.keys()
 
     # Use query to select the data using the project_id and create objects-models fields
     project = db.session.query(Project).filter_by(
         project_id=project_id).first()
     if project is None:
         return None
+
     researcher = db.session.query(Researcher).filter_by(
         id=project.researcher_id).first()
+    evaluation_interval = db.session.query(Evaluation_Interval).filter_by(
+        evaluation_interval_id=project.evaluation_interval_id).first()
 
     # create namedtuples
     Researcher_Namedtuple = namedtuple(
@@ -42,15 +46,19 @@ def get_project(project_id):
     document_columns.append('report')
     Document_Namedtuple = namedtuple(
         Document.__dict__["__tablename__"].lower(), document_columns)
+    Evaluation_Interval_NamedTuple = namedtuple(Evaluation_Interval.__dict__["__tablename__"].lower(),
+                                                evaluation_interval_columns)
 
     project_columns.append('researcher')
     project_columns.append('documents')
+    project_columns.append('evaluation_interval')
     Project_Namedtuple = namedtuple(
         Project.__dict__["__tablename__"].lower(), project_columns)
 
     # create an instance of the object-models
     res_dict = Researcher_Namedtuple(
         **{key: value for key, value in researcher.__dict__.items() if key in researcher_columns})
+
     documents = []
     for d in Document.query.filter_by(project_id=project_id):
         project_rep = Report.query.filter_by(document_id=d.id).first()
@@ -64,8 +72,16 @@ def get_project(project_id):
         d_dict = Document_Namedtuple(**{key: value for key, value in d.__dict__.items()
                                         if key in document_columns}, report=rep_dict)
         documents.append(d_dict)
+
+    # make sure the evaluation_interval exist, otherwise set None
+    if project.evaluation_interval_id is None:
+        evaluation_interval_dict = None
+    else:
+        evaluation_interval_dict = Evaluation_Interval_NamedTuple(**{key: value for key, value in
+                                                                     evaluation_interval.__dict__.items() if key in evaluation_interval_columns})
+
     project_dict = Project_Namedtuple(**{key: value for key, value in project.__dict__.items() if key in project_columns},
-                                      researcher=res_dict, documents=documents)
+                                      researcher=res_dict, documents=documents, evaluation_interval=evaluation_interval_dict)
 
     return project_dict
 
@@ -205,3 +221,25 @@ def re_upload(doc):
     os.remove(file_path)
     # return file_path and use it to save the file in that path
     return file_path
+
+# tested
+
+
+def get_evaluation_interval_by_id(evaluation_interval_id):
+    interval = Evaluation_Interval.query.filter_by(
+        evaluation_interval_id=evaluation_interval_id).first()
+    return interval
+
+# tested
+
+
+def get_all_evaluation_intervals():
+    # these intervals will be showed up for create_project form data
+    intervals = Evaluation_Interval.query.filter(Evaluation_Interval.end > datetime.date(datetime.now())).order_by(
+        Evaluation_Interval.end.desc()).all()
+
+    for interval in intervals:
+        interval.start = interval.start.strftime("%d/%m/%Y")
+        interval.end = interval.end.strftime("%d/%m/%Y")
+
+    return intervals

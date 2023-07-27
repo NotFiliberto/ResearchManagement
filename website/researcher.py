@@ -7,7 +7,7 @@ from flask import Flask
 from flask_login import login_required, current_user
 from .models import Project, ProjectStatus, Document
 from werkzeug.utils import secure_filename
-from .utils import restrict_user, get_project, re_upload, change_project_state, standardize_accents
+from .utils import restrict_user, get_project, re_upload, change_project_state, standardize_accents, get_evaluation_interval_by_id, get_all_evaluation_intervals
 
 
 researcher = Blueprint('researcher', __name__)
@@ -36,14 +36,17 @@ def researcher_home():
 @login_required
 @restrict_user(current_user, ['Researcher'])
 def create_project():
-    if request.method == "GET":
-        return render_template('researcher/create.html', user=current_user)
     if request.method == "POST":
         # Attention: SELECT all the files (.pdf) you need to load ALL AT ONCE -> DON'T DRAG DROP
 
         # Saving data request form into DB Project
         project_name = request.form.get('project_name')
         project_description = request.form.get('description')
+        ev_interval_id = request.form.get('evaluation_interval_id')
+        # check if interval_id matches with a valid interval (current date)
+        interval_selected = get_evaluation_interval_by_id(ev_interval_id)
+        if interval_selected is None:
+            ev_interval_id = None
         # Check number of uploading files
         files = request.files.getlist("files")
         file_str = str(files)
@@ -64,7 +67,7 @@ def create_project():
             pdf_files += 1
         # Creating DB Project (ATTENTION EV_INTERVAL=None -> TESTING PURPOSES)
         project = Project(name=project_name, description=project_description,
-                          evaluation_interval_id=None, status=ProjectStatus.SUBMITTED_FOR_EVALUATION,
+                          evaluation_interval_id=ev_interval_id, status=ProjectStatus.SUBMITTED_FOR_EVALUATION,
                           researcher_id=current_user.id)
         db.session.add(project)
         db.session.commit()
@@ -94,11 +97,14 @@ def create_project():
             # save file in the right folder
             file.save(os.path.join(path_save_into, filename))
             i += 1
-    # here means that everything was loaded correctly
-    flash('Progetto creato con successo: ', category='success')
-    flash(str(i) + " di " + str(total) +
-          " file caricati correttamente", category='success')
-    return render_template('researcher/create.html', user=current_user)
+        # here means that everything was loaded correctly
+        flash('Progetto creato con successo: ', category='success')
+        flash(str(i) + " di " + str(total) +
+              " file caricati correttamente", category='success')
+
+    # Needs to know the list of valid intervals
+    evaluation_intervals = get_all_evaluation_intervals()
+    return render_template('researcher/create.html', user=current_user, evaluation_intervals=evaluation_intervals)
 
 
 @researcher.route('/project', methods=['GET'])
